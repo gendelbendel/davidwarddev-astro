@@ -78,3 +78,14 @@ a:focus {
     display: none;
   }
 }
+
+/* Rounded border */
+hr.rounded {
+  border-top: 4px solid #bbb;
+  border-radius: 5px;
+}
+
+/* Dotted border */
+hr.dotted {
+  border-top: 3px dotted #bbb;
+}
