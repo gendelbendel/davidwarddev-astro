@@ -89,3 +89,12 @@ hr.rounded {
 hr.dotted {
   border-top: 3px dotted #bbb;
 }
+
+html.dark {
+  background-color: #0d0950;
+  color: #fff;
+}
+
+.dark .nav-links a {
+  color: #fff;
+}
