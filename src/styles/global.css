@@ -50,6 +50,11 @@ h1 {
   font-size: 1.2rem;
   font-weight: bold;
   text-transform: uppercase;
+  color: rgb(138, 180, 248);
+}
+
+.nav-links a:visited {
+  color: rgb(138, 180, 248);
 }
 
 .nav-links a:hover,
@@ -91,12 +96,21 @@ hr.dotted {
 }
 
 html.dark {
-  background-color: #0d0950;
+  background-color: #111;
   color: #fff;
 }
 
-.dark .nav-links a {
-  color: #fff;
+.dark a {
+  color: rgb(138, 180, 248);
+}
+
+.dark a:visited {
+  color: #c58af9;
+}
+
+.dark .nav-links a,
+a:visited {
+  color: rgb(138, 180, 248);
 }
 
 .inline-icon {
@@ -127,4 +141,31 @@ html.dark {
     0 2px 4px -2px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
     var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 auto;
+}
+
+.tag a {
+  color: #00539f;
+}
+
+.tag {
+  margin: 0.25em;
+  border: dotted 1px #a1a1a1;
+  border-radius: 0.5em;
+  padding: 0.5em 1em;
+  font-size: 1.15em;
+  background-color: #f8fcfd;
+}
+
+.dark .tag {
+  background-color: #4b5563;
+}
+
+.dark .tag a {
+  color: rgb(138, 180, 248);
 }
