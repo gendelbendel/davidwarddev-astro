@@ -1,0 +1,11 @@
+---
+const { text, color = "#4b5563" } = Astro.props;
+---
+
+<li class="skill">{text}</li>
+
+<style define:vars={{ color }}>
+  .skill {
+    background-color: var(--color);
+  }
+</style>

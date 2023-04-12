@@ -1,5 +1,8 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import Skills from "../components/Skills.astro";
+import Identity from "../components/Identity.astro";
+import Goals from "../components/Goals.astro";
 
 const pageTitle = "About Me";
 
@@ -12,54 +15,47 @@ const identity = {
   hobbies: ["video games", "writing", "teaching"],
 };
 
-const skills = [
-  "Cypress",
-  "Webdriver.io",
-  "JavaScript",
-  "React",
-  "Astro",
-  "Writing Docs",
+const skills = {
+  software: {
+    color: "#065f46",
+    title: "Software Development",
+    items: [
+      "Cypress",
+      "Webdriver.io",
+      "JavaScript",
+      "React",
+      "Astro",
+      "Writing Docs",
+    ],
+  },
+  dataManagement: {
+    color: "rgb(78 24 121)",
+    title: "Data Management",
+    items: ["MySQL", "Postgres", "GraphQL"],
+  },
+  processes: {
+    title: "Processes & Methodologies",
+    items: ["Agile", "Kanban", "Test Driven Development", "Shifting Left"],
+  },
+  hobbies: {
+    color: "rgb(121 24 78)",
+    title: "Hobbies",
+    items: ["Video games", "Astronomy", "Photography", "Game development"],
+  },
+};
+
+const goals = [
+  {
+    title: "Astro Basics",
+    description: "I am happy to be learning Astro!",
+    requirements: "Finish in 3 days",
+    complete: false,
+  },
 ];
-
-const happy = true;
-const finished = false;
-const goal = 3;
-
-const skillColor = "navy";
-const fontWeight = "bold";
-const textCase = "uppercase";
 ---
 
 <BaseLayout pageTitle={pageTitle}>
-  <p>Here are a few facts about me:</p>
-  <ul>
-    <li>My name is {identity.firstName}.</li>
-    <li>
-      I live in {identity.city}, {identity.state}, {identity.country}.
-    </li>
-    <li>I work as a {identity.occupation}.</li>
-    {
-      identity.hobbies.length >= 2 && (
-        <li>
-          Two of my hobbies are: {identity.hobbies[0]} and {identity.hobbies[1]}
-          .
-        </li>
-      )
-    }
-  </ul>
-  <p>My skills are:</p>
-  <ul>
-    {skills.map((skill) => <li class="skill">{skill}</li>)}
-  </ul>
-  {happy && <p>I am happy to be learning Astro!</p>}
-
-  {finished && <p>I finished this tutorial!</p>}
-
-  {
-    goal === 3 ? (
-      <p>My goal is to finish in 3 days.</p>
-    ) : (
-      <p>My goal is not 3 days.</p>
-    )
-  }
+  <Identity identity={identity} />
+  <Skills skills={skills} />
+  <Goals goals={goals} />
 </BaseLayout>

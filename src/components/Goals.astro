@@ -1,0 +1,23 @@
+---
+const { goals } = Astro.props;
+---
+
+<div>
+  <p>My goals:</p>
+  <ul class="goals">
+    {
+      goals.map((goal) => (
+        <li class="goal">
+          {goal.title}
+          <ul>
+            <li>Requirements: {goal.requirements}</li>
+            <>
+              <li>Description: {goal.description}</li>
+              <li>Complete? {goal.complete.toString()}</li>
+            </>
+          </ul>
+        </li>
+      ))
+    }
+  </ul>
+</div>

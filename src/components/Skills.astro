@@ -1,0 +1,20 @@
+---
+import SkillItem from "./SkillItem.astro";
+const { skills } = Astro.props;
+---
+
+<div>
+  <h3>Skills</h3>
+  {
+    Object.keys(skills).map((skillset) => (
+      <div>
+        <p>{skills[skillset].title}:</p>
+        <ul>
+          {skills[skillset].items.map((skill) => (
+            <SkillItem text={skill} color={skills[skillset].color} />
+          ))}
+        </ul>
+      </div>
+    ))
+  }
+</div>

@@ -1,13 +1,23 @@
 ---
 const { platform, username } = Astro.props;
+import Icon from "./Icon.astro";
 ---
 
-<a href={`https://www.${platform}.com/${username}`}>{platform}</a>
+<a
+  aria-label={platform}
+  href={`https://www.${platform}.com/${username}`}
+  target="_blank"
+  rel="noopener"
+>
+  <Icon name={platform} class="icon-class" />
+</a>
+
 <style>
   a {
-    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    padding: 0.5rem 0.5rem;
     color: white;
-    background-color: #4c1d95;
+    background-color: #2460a7;
     text-decoration: none;
   }
 </style>
