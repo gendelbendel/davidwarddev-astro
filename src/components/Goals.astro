@@ -3,7 +3,7 @@ const { goals } = Astro.props;
 ---
 
 <div>
-  <p>My goals:</p>
+  <h3>My goals:</h3>
   <ul class="goals">
     {
       goals.map((goal) => (
@@ -13,7 +13,7 @@ const { goals } = Astro.props;
             <li>Requirements: {goal.requirements}</li>
             <>
               <li>Description: {goal.description}</li>
-              <li>Complete? {goal.complete.toString()}</li>
+              <li>Complete? {goal.complete ? "✅" : "❌"}</li>
             </>
           </ul>
         </li>
