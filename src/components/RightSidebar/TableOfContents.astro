@@ -1,4 +1,5 @@
 ---
+import BackToTop from "./BackToTop.astro";
 const { headings } = Astro.props;
 interface heading {
   id: string;
@@ -49,4 +50,5 @@ const getNestedHeadings = (headingElements, prepend = true) => {
       ))
     }
   </ul>
+  <BackToTop />
 </nav>

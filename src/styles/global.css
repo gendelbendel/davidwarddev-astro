@@ -288,3 +288,8 @@ body::-webkit-scrollbar-track {
     scroll-behavior: smooth;
   }
 }
+
+.back-to-top {
+  width: 1em;
+  height: 1em;
+}

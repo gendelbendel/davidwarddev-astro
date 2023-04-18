@@ -1,0 +1,31 @@
+---
+---
+
+<a href="#" class="btn-back-to-top" aria-label="Back to top">
+  Back to top
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke-width="1.5"
+    stroke="currentColor"
+    class="back-to-top"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      d="M9 9l6-6m0 0l6 6m-6-6v12a6 6 0 01-12 0v-3"></path>
+  </svg>
+</a>
+
+<script>
+  const backToTop = document.querySelectorAll(".btn-back-to-top");
+  backToTop.forEach((link) => {
+    link.addEventListener("click", () => {
+      const top = document.getElementById("top");
+      if (top) {
+        top.scrollIntoView();
+      }
+    });
+  });
+</script>
