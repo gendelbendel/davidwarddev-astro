@@ -1,7 +1,8 @@
 import { defineConfig } from "astro/config";
-import preact from "@astrojs/preact";
+// import preact from "@astrojs/preact";
 import rehypePrettyCode from "rehype-pretty-code";
 import mdx from "@astrojs/mdx";
+import compress from "astro-compress";
 
 const prettyCodeOptions = {
   theme: "dark-plus",
@@ -26,9 +27,12 @@ const prettyCodeOptions = {
 // https://astro.build/config
 export default defineConfig({
   integrations: [
-    preact(),
+    // preact(),
     mdx({
       rehypePlugins: [[rehypePrettyCode, prettyCodeOptions]],
+    }),
+    compress({
+      img: false,
     }),
   ],
   markdown: {
