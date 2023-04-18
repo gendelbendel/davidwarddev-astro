@@ -1,0 +1,143 @@
+---
+title: "Finding niche bugs, and fixing them"
+pubDate: 2023-04-18
+description: "This is the first post of my new Astro blog."
+author: "David Ward"
+image:
+  url: "https://astro.build/assets/press/astro-logo-dark.svg"
+  alt: "The Astro logo"
+tags: ["astro", "blogging", "development", "opensource", "testing"]
+---
+
+Sometimes, it's just the small things that add up to make things better for everyone.
+
+## The project
+
+I stumbled across a [rehype](https://github.com/rehypejs/rehype) plugin for giving a little bit more power to code blocks, like line highlighting and custom line counts, called [rehype-pretty-code](https://github.com/atomiks/rehype-pretty-code).
+
+You can see a demo and look at the docs on their [deployed app](https://rehype-pretty-code.netlify.app/).
+
+## The feature in question
+
+It recently got a contribution that expanded upon its current feature set for setting the starting line number when you request showing line numbers, like so:
+
+````markdown
+```js showLineNumbers{3}
+const test = 1;
+const test2 = 2;
+```
+````
+
+Which when rendered, looks like so:
+
+```js showLineNumbers{3}
+const test = 1;
+const test2 = 2;
+```
+
+You'll notice that it starts on the line 3 when beginning the code block. Great!
+
+It also has an ability to highlight a specific line number as well, like so:
+
+````markdown
+```js {1}
+const test = 1;
+const test2 = 2;
+```
+````
+
+Which when rendered, looks like so:
+
+```js {1}
+const test = 1;
+const test2 = 2;
+```
+
+You'll notice that the first line is highlighted in the browser. Great!
+
+## The problem
+
+Something I noticed was when using _both_ of these features at the same time, depending on how you authored your markdown, you may experience issues with line highlighting not respecting the number you set.
+
+### Example 1: `showLineNumbers` followed by `{x}`
+
+For example, when using `showLineNumbers` followed by `{x}`:
+
+````markdown
+```js showLineNumbers{3} {2}
+const test = 1;
+const test2 = 2;
+```
+````
+
+Which when rendered, looks like so:
+
+```js showLineNumbers{3} {2}
+const test = 1;
+const test2 = 2;
+```
+
+You will observe the bug: the second line (labeled `4) is not highlighted, as would be expected.
+
+> Note:
+> You will not observe the bug once the fix is in place.
+
+### Example 2: `{x}` followed by `showLineNumbers`
+
+````markdown
+```js {2} showLineNumbers{3}
+const test = 1;
+const test2 = 2;
+```
+````
+
+Which when rendered, looks like so:
+
+```js {2} showLineNumbers{3}
+const test = 1;
+const test2 = 2;
+```
+
+You will _not_ observe the bug: the second line (labeled `4) is not highlighted, as would be expected.
+
+## The bug in the code
+
+I found where the issue was: There was a regex that was a little too greedy and not taking into account the newly added `showLineNumbers` feature:
+
+```js {2} showLineNumbers{200}
+const lineNumbers = meta
+  ? rangeParser(meta.match(/{(.*)}/)?.[1] ?? '')
+  : [];
+```
+
+
+## The fix
+So how do we fix it? Well, the simplest way is that since there are no other options that use the `{}` characters, we look to see if the character before a `{` is _not_ a whitespace, and if so we ignore that group and keep searching.
+
+```js {2} showLineNumbers{200} title="the fix"
+const lineNumbers = meta
+  ? rangeParser(meta.match(/(?:^|\s){(.*?)/)?.[1] ?? '')
+  : [];
+```
+
+The addition of the `(?:^|\s)` and adding a `?` in the capture group is the key part!
+
+### Adding tests
+
+But we wouldn't be a good dev _or_ tester if we didn't also add tests that cover this!
+
+Turns out they are using snapshot testing, which accepts a markdown file as fixture input, and expected results with the same name, but in an html file, corresponding to what html the plugin would generate exactly.
+
+So, we added a markdown file with a very similar set of data as we showed in [the problem](#the-problem), and then used one of the existing results html as a template and modified data according to what the markdown contained...
+
+And the tests passed!
+
+## Impact and severity
+
+This is a pretty minor bug in the grand scheme of things, with rather low severity, but still a bug and the fix wasn't terribly hard, either. 
+
+Always strive for quality, and leave things better than you found them.
+
+## Pull request
+
+https://github.com/atomiks/rehype-pretty-code/pull/75

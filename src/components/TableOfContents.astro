@@ -35,17 +35,7 @@ const getNestedHeadings = (headingElements, prepend = true) => {
     {
       getNestedHeadings(headings).map((heading) => (
         <li id={heading.id + "-li"}>
-          <a
-            href={`#${heading.id}`}
-            onclick={(e) => {
-              e.preventDefault();
-              document.querySelector(`#${heading.id}`).scrollIntoView({
-                behavior: "smooth",
-              });
-            }}
-          >
-            {heading.text}
-          </a>
+          <a href={`#${heading.id}`}>{heading.text}</a>
           {heading.items.length > 0 && (
             <ul>
               {heading.items.map((child) => (

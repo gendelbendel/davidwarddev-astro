@@ -196,21 +196,6 @@ a:visited {
   color: rgb(138, 180, 248);
 }
 
-/* footer {
-  margin: auto;
-  width: 50%;
-  display: flex;
-  gap: 1rem;
-  margin-top: 2rem;
-} */
-
-/* footer div {
-  margin: auto;
-  width: 50%;
-  display: flex;
-  gap: 1rem;
-} */
-
 pre {
   box-shadow: 0 0 10px hsla(269, 79%, 50%, 1);
   -webkit-border-radius: 10px;
@@ -227,16 +212,17 @@ code {
   counter-reset: line;
 }
 
-code > .line::before {
+code[data-line-numbers] > .line::before {
   counter-increment: line;
   content: counter(line);
 }
 
 code > .line::before {
   /* Other styling */
+  content: " ";
   display: inline-block;
   width: 1rem;
-  margin-right: 2rem;
+  margin-right: 1rem;
   text-align: right;
   color: gray;
   border-left-width: 3px;

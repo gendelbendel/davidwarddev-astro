@@ -1,8 +1,13 @@
 ---
+import { getCollection } from "astro:content";
+
 import BaseLayout from "../layouts/BaseLayout.astro";
 import BlogPost from "../components/BlogPost.astro";
-import { getCollection } from "astro:content";
+
+import { sortByDate } from "../utils/sortByDate";
+
 const allPosts = await getCollection("posts");
+const sortedPosts = allPosts.sort(sortByDate(true));
 const pageTitle = "Blog";
 ---
 
@@ -10,7 +15,7 @@ const pageTitle = "Blog";
   <h2>My blog</h2>
   <ul>
     {
-      allPosts.map((post) => (
+      sortedPosts.map((post) => (
         <BlogPost url={"/posts/" + post.slug} title={post.data.title} />
       ))
     }
