@@ -8,9 +8,20 @@ const { pageTitle } = Astro.props;
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <meta content="en_US" property="og:locale" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
+    <meta content="David Ward" name="application-name" />
+    <meta content="David Ward" property="og:site_name" />
+    <meta content="David Ward" name="apple-mobile-web-app-title" />
+    <meta
+      name="description"
+      content="David Ward's personal site and blog dedicated to all things react, Astro, and software testing."
+    />
+    <meta content="yes" name="mobile-web-app-capable" />
+    <meta content="yes" name="apple-mobile-web-app-capable" />
+    <meta content={Astro.url.origin} property="og:url" />
     <title>{pageTitle}</title>
   </head>
   <body>
