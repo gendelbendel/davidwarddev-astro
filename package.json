@@ -10,10 +10,12 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/mdx": "^0.19.0",
     "@astrojs/preact": "^2.1.0",
     "@astrojs/rss": "^2.3.2",
     "astro": "^2.2.2",
-    "preact": "^10.13.2"
+    "preact": "^10.13.2",
+    "rehype-pretty-code": "^0.9.4"
   },
   "devDependencies": {
     "simple-icons": "^8.10.0"

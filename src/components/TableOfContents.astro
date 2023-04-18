@@ -1,0 +1,62 @@
+---
+const { headings } = Astro.props;
+interface heading {
+  id: string;
+  text: string;
+  items?: Array<heading>;
+}
+const getNestedHeadings = (headingElements, prepend = true) => {
+  function getHeading(nestedHeadings, heading): heading[] {
+    if (heading.depth === 2) {
+      nestedHeadings.push({ id: heading.slug, text: heading.text, items: [] });
+    } else if (heading.depth === 3 && nestedHeadings.length > 0) {
+      nestedHeadings[nestedHeadings.length - 1].items.push({
+        id: heading.slug,
+        text: heading.text,
+        items: [],
+      });
+    }
+    return nestedHeadings;
+  }
+  if (prepend) {
+    return [
+      { depth: 2, slug: "overview", text: "Overview" },
+      ...headingElements,
+    ].reduce((acc, heading) => getHeading(acc, heading), []);
+  }
+
+  return headingElements.reduce((acc, heading) => getHeading(acc, heading), []);
+};
+---
+
+<nav class="toc">
+  <h3 id="toc-title">On this page</h3>
+  <ul>
+    {
+      getNestedHeadings(headings).map((heading) => (
+        <li id={heading.id + "-li"}>
+          <a
+            href={`#${heading.id}`}
+            onclick={(e) => {
+              e.preventDefault();
+              document.querySelector(`#${heading.id}`).scrollIntoView({
+                behavior: "smooth",
+              });
+            }}
+          >
+            {heading.text}
+          </a>
+          {heading.items.length > 0 && (
+            <ul>
+              {heading.items.map((child) => (
+                <li id={child.id + "-li"}>
+                  <a href={`#${child.id}`}>{child.text}</a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </li>
+      ))
+    }
+  </ul>
+</nav>

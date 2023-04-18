@@ -1,0 +1,12 @@
+---
+import { identity, skills, goals } from "../../data/me.json";
+import Identity from "./Identity.astro";
+import Skills from "./Skills.astro";
+import Goals from "./Goals.astro";
+---
+
+<div>
+  <Identity identity={identity} />
+  <Skills skills={skills} />
+  <Goals goals={goals} />
+</div>

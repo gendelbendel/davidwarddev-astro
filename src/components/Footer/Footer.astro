@@ -1,0 +1,12 @@
+---
+import Social from "../UI/Social.astro";
+---
+
+<footer>
+  <div class="socials">
+    <Social platform="twitter" username="gendelbendel" />
+    <Social platform="github" username="gendelbendel" />
+    <Social platform="linkedIn" username="in/david-ward-pdx" />
+    <Social platform="rss" overrideUrl={Astro.url.origin + "/rss.xml"} />
+  </div>
+</footer>

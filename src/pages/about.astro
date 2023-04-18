@@ -1,61 +1,10 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import Skills from "../components/Skills.astro";
-import Identity from "../components/Identity.astro";
-import Goals from "../components/Goals.astro";
+import AboutMe from "../components/About/AboutMe.astro";
 
 const pageTitle = "About Me";
-
-const identity = {
-  firstName: "David",
-  country: "USA",
-  state: "Oregon",
-  city: "Portland",
-  occupation: "Senior Software Engineer in Test (SDET)",
-  hobbies: ["video games", "writing", "teaching"],
-};
-
-const skills = {
-  software: {
-    color: "#065f46",
-    title: "Software Development",
-    items: [
-      "Cypress",
-      "Webdriver.io",
-      "JavaScript",
-      "React",
-      "Astro",
-      "Writing Docs",
-    ],
-  },
-  dataManagement: {
-    color: "rgb(78 24 121)",
-    title: "Data Management",
-    items: ["MySQL", "Postgres", "GraphQL"],
-  },
-  processes: {
-    title: "Processes & Methodologies",
-    items: ["Agile", "Kanban", "Test Driven Development", "Shifting Left"],
-  },
-  hobbies: {
-    color: "rgb(121 24 78)",
-    title: "Hobbies",
-    items: ["Video games", "Astronomy", "Photography", "Game development"],
-  },
-};
-
-const goals = [
-  {
-    title: "Astro Basics",
-    description: "I am happy to be learning Astro!",
-    requirements: "Finish in 3 days",
-    complete: true,
-  },
-];
 ---
 
 <BaseLayout pageTitle={pageTitle}>
-  <Identity identity={identity} />
-  <Skills skills={skills} />
-  <Goals goals={goals} />
+  <AboutMe />
 </BaseLayout>

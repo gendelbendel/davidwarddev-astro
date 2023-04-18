@@ -1,11 +1,11 @@
 ---
-const { platform, username } = Astro.props;
+const { platform, username, overrideUrl } = Astro.props;
 import Icon from "./Icon.astro";
 ---
 
 <a
   aria-label={platform}
-  href={`https://www.${platform}.com/${username}`}
+  href={overrideUrl ? overrideUrl : `https://www.${platform}.com/${username}`}
   target="_blank"
   rel="noopener"
 >

@@ -1,12 +1,12 @@
 import rss from "@astrojs/rss";
 import { getCollection } from "astro:content";
 
-export async function get() {
+export async function get(context) {
   const posts = await getCollection("posts");
   return rss({
-    title: "Astro Learner | Blog",
-    description: "My journey learning Astro",
-    site: "https://my-blog-site.netlify.app",
+    title: "David Ward | Blog",
+    description: "Learn more about David Ward and what they're up to",
+    site: context.site,
     items: posts.map((post) => ({
       title: post.data.title,
       pubDate: post.data.pubDate,
