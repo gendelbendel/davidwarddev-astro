@@ -1,0 +1,11 @@
+---
+import { format, isDate, parseISO } from "date-fns";
+
+const { date, formatString = "LLLL do, yyyy" } = Astro.props;
+
+const dateToFormat = isDate(date) ? date : parseISO(date);
+---
+
+<time datetime={format(date, "yyyy-MM-dd")}>
+  {format(dateToFormat, formatString)}
+</time>

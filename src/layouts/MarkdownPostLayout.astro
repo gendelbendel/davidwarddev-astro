@@ -2,14 +2,24 @@
 const { frontmatter, headings } = Astro.props;
 import BaseLayout from "./BaseLayout.astro";
 import TableOfContents from "../components/RightSidebar/TableOfContents.astro";
+import DateFormat from "../components/DateFormat.astro";
 ---
 
 <BaseLayout pageTitle={frontmatter.title}>
   <div>
-    <p>Posted on: {frontmatter.pubDate.toDateString()}</p>
+    <div>
+      <p>
+        Posted on: <DateFormat date={frontmatter.pubDate} formatString="yyyy" />
+      </p>
+    </div>
+
     {
       frontmatter.updateDate && (
-        <p>Updated on: {frontmatter.updateDate.toDateString()}</p>
+        <div>
+          <p>
+            Updated on: <DateFormat date={frontmatter.updateDate} />
+          </p>
+        </div>
       )
     }
     <p><em>{frontmatter.description}</em></p>

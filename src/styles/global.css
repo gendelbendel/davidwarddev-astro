@@ -1,5 +1,12 @@
+:root {
+  --main-bg-color: #f1f5f9;
+  --main-bg-dark-color: #111;
+  --main-link-base-dark-color: rgb(138, 180, 248);
+  --code-block-border-glow-color: hsla(269, 79%, 50%, 1);
+}
+
 html {
-  background-color: #f1f5f9;
+  background-color: var(--main-bg-color);
   font-family: sans-serif;
 }
 
@@ -51,12 +58,12 @@ h1 {
   font-size: 1.2rem;
   font-weight: bold;
   text-transform: uppercase;
-  color: rgb(138, 180, 248);
+  color: var(--main-link-base-dark-color);
   text-align: center;
 }
 
 .nav-links a:visited {
-  color: rgb(138, 180, 248);
+  color: var(--main-link-base-dark-color);
 }
 
 .nav-links a:hover,
@@ -100,12 +107,12 @@ a:focus {
     top: 48px;
     max-height: calc(100vh - 70px);
     overflow: auto;
-    box-shadow: 0 0 5px hsla(269, 79%, 50%, 1);
+    box-shadow: 0 0 5px var(--code-block-border-glow-color);
     border-radius: 10px;
   }
 }
 
-@media screen and (max-width: 1030px) {
+@media screen and (max-width: 930px) {
   .toc {
     display: none;
   }
@@ -123,7 +130,7 @@ hr.dotted {
 }
 
 html.dark {
-  background-color: #111;
+  background-color: var(--main-bg-dark-color);
   color: #fff;
 }
 
@@ -197,7 +204,7 @@ a:visited {
 }
 
 pre {
-  box-shadow: 0 0 10px hsla(269, 79%, 50%, 1);
+  box-shadow: 0 0 10px var(--code-block-border-glow-color);
   -webkit-border-radius: 10px;
   -khtml-border-radius: 10px;
   -moz-border-radius: 10px;
@@ -292,4 +299,16 @@ body::-webkit-scrollbar-track {
 .back-to-top {
   width: 1em;
   height: 1em;
+}
+
+.toc-title {
+  margin-top: 0.2rem;
+}
+
+.toc a,
+.toc a:visited,
+.toc a:hover,
+.toc a:active {
+  text-decoration: none;
+  color: var(--main-link-base-dark-color);
 }

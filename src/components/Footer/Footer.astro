@@ -1,5 +1,6 @@
 ---
 import Social from "../UI/Social.astro";
+import DateFormat from "../DateFormat.astro";
 ---
 
 <footer>
@@ -9,4 +10,5 @@ import Social from "../UI/Social.astro";
     <Social platform="linkedIn" username="in/david-ward-pdx" />
     <Social platform="rss" overrideUrl={Astro.url.origin + "/rss.xml"} />
   </div>
+  <p>Copyright © 2023 David Ward</p>
 </footer>
