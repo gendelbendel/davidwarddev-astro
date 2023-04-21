@@ -17,7 +17,7 @@
     "astro-compress": "^1.1.36",
     "date-fns": "^2.29.3",
     "preact": "^10.13.2",
-    "rehype-pretty-code": "^0.9.4"
+    "rehype-pretty-code": "^0.9.5"
   },
   "devDependencies": {
     "simple-icons": "^8.10.0"
