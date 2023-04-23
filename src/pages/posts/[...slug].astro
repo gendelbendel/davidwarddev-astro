@@ -2,10 +2,13 @@
 import { getCollection } from "astro:content";
 import MarkdownPostLayout from "../../layouts/MarkdownPostLayout.astro";
 import Markdown from "../../components/Markdown.astro";
+import { filterDraft } from "../../utils/filterDraft";
 
 export async function getStaticPaths() {
   const blogEntries = await getCollection("posts");
-  return blogEntries.map((entry) => ({
+  const noDraftPosts = blogEntries.filter(filterDraft);
+
+  return noDraftPosts.map((entry) => ({
     params: { slug: entry.slug },
     props: { entry },
   }));

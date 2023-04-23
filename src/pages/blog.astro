@@ -5,9 +5,11 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import BlogPost from "../components/BlogPost.astro";
 
 import { sortPostByPubDate } from "../utils/sortByDate";
+import { filterDraft } from "../utils/filterDraft";
 
 const allPosts = await getCollection("posts");
-const sortedPosts = allPosts.sort(sortPostByPubDate(true));
+const noDraftPosts = allPosts.filter(filterDraft);
+const sortedPosts = noDraftPosts.sort(sortPostByPubDate(true));
 const pageTitle = "Blog";
 ---
 

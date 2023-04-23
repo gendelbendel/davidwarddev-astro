@@ -326,3 +326,8 @@ body::-webkit-scrollbar-track {
 footer {
   margin-top: auto;
 }
+
+.draft-warning {
+  color: white;
+  background-color: red;
+}

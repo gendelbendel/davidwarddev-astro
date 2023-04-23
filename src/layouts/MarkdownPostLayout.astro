@@ -7,6 +7,13 @@ import DateFormat from "../components/DateFormat.astro";
 
 <BaseLayout pageTitle={frontmatter.title}>
   <div>
+    {
+      frontmatter.draft && (
+        <div class="draft-warning">
+          <h2>Post is a "draft"; will not appear in prod</h2>
+        </div>
+      )
+    }
     <div>
       <p>
         Posted on: <DateFormat date={frontmatter.pubDate} />

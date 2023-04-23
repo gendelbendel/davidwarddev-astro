@@ -6,10 +6,15 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import BlogPost from "../components/BlogPost.astro";
 
 import { sortPostByPubDate, sortPostByUpdateDate } from "../utils/sortByDate";
+import { filterDraft } from "../utils/filterDraft";
 
 const allPosts = await getCollection("posts");
-const recentlyAddedPosts = allPosts.sort(sortPostByPubDate(true)).slice(0, 3);
-const recentlyUpdatedPosts = allPosts
+const noDraftPosts = allPosts.filter(filterDraft);
+
+const recentlyAddedPosts = noDraftPosts
+  .sort(sortPostByPubDate(true))
+  .slice(0, 3);
+const recentlyUpdatedPosts = noDraftPosts
   .filter((post) => post.data.updateDate)
   .sort(sortPostByUpdateDate(true))
   .slice(0, 3);

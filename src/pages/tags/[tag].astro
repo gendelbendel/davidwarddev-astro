@@ -2,14 +2,18 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
 import BlogPost from "../../components/BlogPost.astro";
+import { filterDraft } from "../../utils/filterDraft";
+
 export async function getStaticPaths() {
   const allPosts = await getCollection("posts");
+  const noDraftPosts = allPosts.filter(filterDraft);
+
   const uniqueTags = [
-    ...new Set(allPosts.map((post) => post.data.tags).flat()),
+    ...new Set(noDraftPosts.map((post) => post.data.tags).flat()),
   ];
 
   return uniqueTags.map((tag) => {
-    const filteredPosts = allPosts.filter((post) =>
+    const filteredPosts = noDraftPosts.filter((post) =>
       post.data.tags.includes(tag)
     );
     return {
