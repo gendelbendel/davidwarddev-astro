@@ -28,7 +28,7 @@ import DateFormat from "../components/DateFormat.astro";
     <div>
       Tags: <div class="tags">
         {
-          frontmatter.tags.map((tag) => (
+          frontmatter.tags.sort().map((tag) => (
             <p class="tag">
               <a href={`/tags/${tag}`}>{tag}</a>
             </p>
