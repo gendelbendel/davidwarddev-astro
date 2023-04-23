@@ -1,13 +1,15 @@
 ---
 title: "Finding niche bugs, and fixing them"
 pubDate: 2023-04-18
-description: "This is the first post of my new Astro blog."
+description: "Found a bug in a rehype plugin. Let's dive into what happened and how I fixed it."
 author: "David Ward"
 image:
   url: "https://astro.build/assets/press/astro-logo-dark.svg"
   alt: "The Astro logo"
-tags: ["astro", "blogging", "development", "opensource", "testing"]
+tags: ["astro", "blogging", "development", "opensource", "testing", "bugs"]
 ---
+
+## Summary
 
 Sometimes, it's just the small things that add up to make things better for everyone.
 
@@ -105,18 +107,16 @@ You will _not_ observe the bug: the second line (labeled `4) is not highlighted,
 I found where the issue was: There was a regex that was a little too greedy and not taking into account the newly added `showLineNumbers` feature:
 
 ```js {2} showLineNumbers{200}
-const lineNumbers = meta
-  ? rangeParser(meta.match(/{(.*)}/)?.[1] ?? '')
-  : [];
+const lineNumbers = meta ? rangeParser(meta.match(/{(.*)}/)?.[1] ?? "") : [];
 ```
 
-
 ## The fix
+
 So how do we fix it? Well, the simplest way is that since there are no other options that use the `{}` characters, we look to see if the character before a `{` is _not_ a whitespace, and if so we ignore that group and keep searching.
 
 ```js {2} showLineNumbers{200} title="the fix"
 const lineNumbers = meta
-  ? rangeParser(meta.match(/(?:^|\s){(.*?)/)?.[1] ?? '')
+  ? rangeParser(meta.match(/(?:^|\s){(.*?)/)?.[1] ?? "")
   : [];
 ```
 
@@ -134,7 +134,7 @@ And the tests passed!
 
 ## Impact and severity
 
-This is a pretty minor bug in the grand scheme of things, with rather low severity, but still a bug and the fix wasn't terribly hard, either. 
+This is a pretty minor bug in the grand scheme of things, with rather low severity, but still a bug and the fix wasn't terribly hard, either.
 
 Always strive for quality, and leave things better than you found them.
 
