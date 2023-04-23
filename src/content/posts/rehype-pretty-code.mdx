@@ -107,7 +107,9 @@ You will _not_ observe the bug: the second line (labeled `4) is not highlighted,
 I found where the issue was: There was a regex that was a little too greedy and not taking into account the newly added `showLineNumbers` feature:
 
 ```js {2} showLineNumbers{200}
-const lineNumbers = meta ? rangeParser(meta.match(/{(.*)}/)?.[1] ?? "") : [];
+const lineNumbers = meta 
+  ? rangeParser(meta.match(/{(.*)}/)?.[1] ?? "") 
+  : [];
 ```
 
 ## The fix
