@@ -1,13 +1,18 @@
 ---
 import Social from "../UI/Social.astro";
 import DateFormat from "../DateFormat.astro";
+import { identity } from "../../data/me.json";
 ---
 
 <footer>
   <div class="socials">
-    <Social platform="github" username="gendelbendel" />
-    <Social platform="linkedIn" username="in/david-ward-pdx" />
+    <Social platform="github" username={identity.github} />
+    <Social platform="linkedIn" username={"in/" + identity.linkedin} />
     <Social platform="rss" overrideUrl={Astro.url.origin + "/rss.xml"} />
   </div>
-  <p>Copyright © 2023 David Ward</p>
+  <p>
+    Copyright © <DateFormat date={new Date()} formatString="yyyy" />
+    {identity.firstName}
+    {identity.lastName}
+  </p>
 </footer>

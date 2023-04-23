@@ -2,11 +2,11 @@
 import { getCollection } from "astro:content";
 
 import BaseLayout from "../layouts/BaseLayout.astro";
-
 import BlogPost from "../components/BlogPost.astro";
 
 import { sortPostByPubDate, sortPostByUpdateDate } from "../utils/sortByDate";
 import { filterDraft } from "../utils/filterDraft";
+import { identity } from "../data/me.json";
 
 const allPosts = await getCollection("posts");
 const noDraftPosts = allPosts.filter(filterDraft);
@@ -23,7 +23,7 @@ const pageTitle = "Home";
 ---
 
 <BaseLayout pageTitle={pageTitle}>
-  <h2>Hey! I'm David!</h2>
+  <h2>Hey! I'm {identity.firstName}!</h2>
   <p>Find out more <a href="/about">about me here.</a></p>
   <h2>Recently Added Posts</h2>
   <ul>

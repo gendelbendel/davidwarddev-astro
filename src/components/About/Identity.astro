@@ -1,17 +1,27 @@
 ---
 import Link from "../Link.astro";
+import { differenceInYears, parseISO } from "date-fns";
 const { identity } = Astro.props;
+
+const getYearsDifference = () =>
+  differenceInYears(new Date(), parseISO(identity.careerStart)) + 2;
 ---
 
 <div>
   <h2>Who I am</h2>
   <ul>
-    <li>My name is {identity.firstName}.</li>
+    <li>My name is {identity.firstName} {identity.lastName}.</li>
     <li>I am a citizen of {identity.citizenOf}.</li>
     <li>
       I currently live in {identity.city}, {identity.state}, {identity.country}.
     </li>
     <li>I work as a {identity.occupation}.</li>
+    <li>
+      I have been working professionally in that role for over {
+        getYearsDifference()
+      }
+      year{getYearsDifference() > 1 ? "s" : ""}.
+    </li>
   </ul>
   <p>Find my resume <Link href={identity.resumeLink}>here.</Link></p>
 </div>

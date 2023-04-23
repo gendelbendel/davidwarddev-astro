@@ -1,40 +1,71 @@
 {
   "identity": {
     "firstName": "David",
+    "lastName": "Ward",
     "country": "USA",
     "state": "Oregon",
     "city": "Portland",
     "citizenOf": "the USA",
     "occupation": "Senior Software Engineer in Test (SDET)",
+    "careerStart": "2015-09-01",
     "hobbies": ["video games", "writing", "teaching"],
-    "resumeLink": "https://resumonk.com/dward"
+    "resumeLink": "https://resumonk.com/dward",
+    "github": "gendelbendel",
+    "linkedin": "david-ward-pdx"
   },
   "skills": {
+    "testAutomation": {
+      "color": "#2353a1",
+      "title": "Test Automation / Tools",
+      "items": [
+        "Cypress",
+        "Webdriver.io",
+        "Playwright",
+        "JMeter",
+        "Postman",
+        "Charles Proxy"
+      ]
+    },
     "software": {
       "color": "#065f46",
       "title": "Software Development",
       "items": [
-        "Cypress",
-        "Webdriver.io",
-        "JavaScript",
+        "Javascript",
+        "Typescript",
+        "Node.js",
+        "Elixir",
         "React",
         "Astro",
-        "Writing Docs"
+        "Docker"
       ]
     },
     "dataManagement": {
       "color": "rgb(78 24 121)",
       "title": "Data Management",
-      "items": ["MySQL", "Postgres", "GraphQL"]
+      "items": ["MySQL", "Postgres", "GraphQL", "CI/CD"]
     },
     "processes": {
-      "title": "Processes & Methodologies",
-      "items": ["Agile", "Kanban", "Test Driven Development", "Shifting Left"]
+      "color": "#6d7013",
+      "title": "SDLC Processes",
+      "items": [
+        "Jira",
+        "Agile",
+        "Kanban",
+        "Test Driven Development",
+        "Shifting Left",
+        "RST"
+      ]
     },
     "hobbies": {
       "color": "rgb(121 24 78)",
       "title": "Hobbies",
-      "items": ["Video games", "Astronomy", "Photography", "Game development"]
+      "items": [
+        "Video games",
+        "Music",
+        "Astronomy",
+        "Photography",
+        "Game development"
+      ]
     }
   },
   "goals": [
