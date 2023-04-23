@@ -1,12 +1,40 @@
 ---
+import { getCollection } from "astro:content";
+
 import BaseLayout from "../layouts/BaseLayout.astro";
-// import Greeting from "../components/Greeting.jsx";
+
+import BlogPost from "../components/BlogPost.astro";
+
+import { sortPostByPubDate, sortPostByUpdateDate } from "../utils/sortByDate";
+
+const allPosts = await getCollection("posts");
+const recentlyAddedPosts = allPosts.sort(sortPostByPubDate(true)).slice(0, 3);
+const recentlyUpdatedPosts = allPosts
+  .filter((post) => post.data.updateDate)
+  .sort(sortPostByUpdateDate(true))
+  .slice(0, 3);
 
 const pageTitle = "Home";
 ---
 
 <BaseLayout pageTitle={pageTitle}>
-  <h2>I'm learning Astro!</h2>
-  <p>Here's where I'm playing around with it. Have fun!</p>
+  <h2>Hey! I'm David!</h2>
+  <p>Find out more <a href="/about">about me here.</a></p>
+  <h2>Recently Added Posts</h2>
+  <ul>
+    {
+      recentlyAddedPosts.map((post) => (
+        <BlogPost url={"/posts/" + post.slug} title={post.data.title} />
+      ))
+    }
+  </ul>
+  <h2>Recently Updated Posts</h2>
+  <ul>
+    {
+      recentlyUpdatedPosts.map((post) => (
+        <BlogPost url={"/posts/" + post.slug} title={post.data.title} />
+      ))
+    }
+  </ul>
   <!-- <Greeting client:load messages={["Hi", "Hello", "Howdy", "Hey there"]} /> -->
 </BaseLayout>

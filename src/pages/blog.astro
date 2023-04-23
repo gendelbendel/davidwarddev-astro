@@ -4,10 +4,10 @@ import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import BlogPost from "../components/BlogPost.astro";
 
-import { sortByDate } from "../utils/sortByDate";
+import { sortPostByPubDate } from "../utils/sortByDate";
 
 const allPosts = await getCollection("posts");
-const sortedPosts = allPosts.sort(sortByDate(true));
+const sortedPosts = allPosts.sort(sortPostByPubDate(true));
 const pageTitle = "Blog";
 ---
 

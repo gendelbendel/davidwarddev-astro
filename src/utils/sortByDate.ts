@@ -1,8 +1,4 @@
-import type { CollectionEntry } from "astro:content";
-
-export function sortByDate(
-  descending: boolean = true
-): (a: CollectionEntry<"posts">, b: CollectionEntry<"posts">) => number {
+export function sortPostByPubDate(descending: boolean = true) {
   if (descending) {
     return function (a, b) {
       // use + to coerce to number
@@ -11,5 +7,17 @@ export function sortByDate(
   }
   return function (a, b) {
     return +a.data.pubDate.valueOf() - +b.data.pubDate.valueOf();
+  };
+}
+
+export function sortPostByUpdateDate(descending: boolean = true) {
+  if (descending) {
+    return function (a, b) {
+      // use + to coerce to number
+      return +b.data.updateDate?.valueOf() - +a.data.updateDate?.valueOf();
+    };
+  }
+  return function (a, b) {
+    return +a.data.updateDate.valueOf() - +b.data.updateDate.valueOf();
   };
 }
