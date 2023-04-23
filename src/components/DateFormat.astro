@@ -6,6 +6,6 @@ const { date, formatString = "LLLL do, yyyy" } = Astro.props;
 const dateToFormat = isDate(date) ? date : parseISO(date);
 ---
 
-<time datetime={format(date, "yyyy-MM-dd")}>
+<time datetime={format(dateToFormat, "yyyy-MM-dd")}>
   {format(dateToFormat, formatString)}
 </time>

@@ -4,6 +4,7 @@
     "country": "USA",
     "state": "Oregon",
     "city": "Portland",
+    "citizenOf": "the USA",
     "occupation": "Senior Software Engineer in Test (SDET)",
     "hobbies": ["video games", "writing", "teaching"],
     "resumeLink": "https://resumonk.com/dward"
@@ -41,7 +42,8 @@
       "title": "Astro Basics",
       "description": "I am happy to be learning Astro!",
       "requirements": "Finish in 3 days",
-      "complete": true
+      "complete": true,
+      "completeDate": "2023-04-11"
     }
   ]
 }

@@ -1,5 +1,7 @@
 ---
 const { goals } = Astro.props;
+
+import DateFormat from "../DateFormat.astro";
 ---
 
 <div>
@@ -14,6 +16,11 @@ const { goals } = Astro.props;
             <>
               <li>Description: {goal.description}</li>
               <li>Complete? {goal.complete ? "✅" : "❌"}</li>
+              {goal.completeDate && (
+                <li>
+                  Complete date: <DateFormat date={goal.completeDate} />
+                </li>
+              )}
             </>
           </ul>
         </li>
