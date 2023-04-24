@@ -1,0 +1,53 @@
+---
+title: "kgc-companion: The tool for sharing King God Castle teams"
+pubDate: 2022-05-17
+updateDate: 2022-10-01
+description: "Create and share formations and team compositions for the mobile game 'King God Castle' with this tool!"
+author: "David Ward"
+image:
+  url: "/project-kgc-companion.png"
+  alt: "The kgc-companion project preview image"
+tags: ["elixir", "liveview", "gaming", "development", "projects"]
+---
+
+import DateFormat from "../../components/DateFormat.astro";
+
+I used to play a mobile game called [King God Castle](https://apps.apple.com/us/app/king-god-castle/id1526791430), an RPG gatcha game where character development and team formations were a pivital point to your success in the game.
+
+If you had a bad team, or placed your team in the map in an inefficient way, there was a high likelihood you were going to lose, and with the game's Food system (the resource you spend to go into a mission) being tied directly to time or real cash dollars spent, you want your attempts to be as successful as possible.
+
+Enter this tool.
+
+## Tech
+
+I really wanted to explore using [Elixir](https://elixir-lang.org/) and [Liveview](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html) for this project. I also use [Tailwind](https://tailwindcss.com/) for styling.
+
+## Features
+
+- [Formation Builder](https://kgc-companion.fly.dev/formation/new)
+  - Drag and drop heroes from the Hero Pool up into the Formation Zone
+  - Name your team formation
+  - Accidentally dragged a hero you don't need? Drag it into the Trash Zone
+  - Export formation to image
+    - Uses javascript canvas library to generate a PNG of the Formation Zone. (Note: Quite buggy)
+- [Team Builder](https://kgc-companion.fly.dev/team/new)
+  - Export formation to image
+    - Uses javascript canvas library to generate a PNG of the full Team Builder screen. (Note: Quite buggy)
+  - Meta details
+    - Name your team, give it a description (such as item priority), and designate which game mode the team is for by selecting a purpose
+  - Altars
+    - Use single arrows (+/- 1 point) or double arrows (+/- 5 points) to choose
+  - Team
+    - Choose each hero, including their Barracks level, awakening, and relic stat priority
+  - Relics
+    - Choose both relics and their tier, as well as whether they are required for the comp or not
+
+## The project
+
+Find it here! https://kgc-companion.fly.dev/
+
+## Updates
+
+- <DateFormat date="2022-10-01" />: As I no longer play the game, I will not be
+  updating it any further. As such, I have also let the [old
+  domain](https://kgc-companion.com) expire.
