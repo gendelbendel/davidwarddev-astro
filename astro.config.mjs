@@ -1,4 +1,5 @@
 import { defineConfig } from "astro/config";
+import { astroImageTools } from "astro-imagetools";
 // import preact from "@astrojs/preact";
 import rehypePrettyCode from "rehype-pretty-code";
 import mdx from "@astrojs/mdx";
@@ -31,6 +32,7 @@ export default defineConfig({
     mdx({
       rehypePlugins: [[rehypePrettyCode, prettyCodeOptions]],
     }),
+    astroImageTools,
     compress({
       img: false,
     }),

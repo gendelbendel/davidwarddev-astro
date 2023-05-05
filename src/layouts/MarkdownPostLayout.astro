@@ -1,5 +1,6 @@
 ---
 const { frontmatter, headings } = Astro.props;
+import { Picture } from "astro-imagetools/components";
 import BaseLayout from "./BaseLayout.astro";
 import TableOfContents from "../components/RightSidebar/TableOfContents.astro";
 import DateFormat from "../components/DateFormat.astro";
@@ -31,7 +32,20 @@ import DateFormat from "../components/DateFormat.astro";
     }
     <p><em>{frontmatter.description}</em></p>
     <p>Written by: {frontmatter.author}</p>
-    <img src={frontmatter.image.url} width="300" alt={frontmatter.image.alt} />
+    {
+      frontmatter.image.url.endsWith("svg") && (
+        <img src={frontmatter.image.url} alt={frontmatter.image.alt} />
+      )
+    }
+    {
+      !frontmatter.image.url.endsWith("svg") && (
+        <Picture
+          src={frontmatter.image.url}
+          alt={frontmatter.image.alt}
+          quality={80}
+        />
+      )
+    }
     <div>
       Tags: <div class="tags">
         {
