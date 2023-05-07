@@ -1,0 +1,32 @@
+diff --git a/node_modules/astro-imagetools/astroViteConfigs.js b/node_modules/astro-imagetools/astroViteConfigs.js
+new file mode 100644
+index 0000000..1848173
+--- /dev/null
++++ b/node_modules/astro-imagetools/astroViteConfigs.js
+@@ -0,0 +1,12 @@
++export default {
++  "environment": "dev",
++  "isSsrBuild": false,
++  "projectBase": "",
++  "publicDir": "/Users/davidward/git/personal/davidwarddev-astro/public/",
++  "rootDir": "/Users/davidward/git/personal/davidwarddev-astro/",
++  "mode": "development",
++  "outDir": "dist",
++  "assetsDir": "/_astro",
++  "sourcemap": false,
++  "assetFileNames": "/_astro/[name]@[width].[hash][extname]"
++}
+\ No newline at end of file
+diff --git a/node_modules/astro-imagetools/integration/index.js b/node_modules/astro-imagetools/integration/index.js
+index b7817f4..45983d1 100644
+--- a/node_modules/astro-imagetools/integration/index.js
++++ b/node_modules/astro-imagetools/integration/index.js
+@@ -15,7 +15,7 @@ export default {
+     "astro:config:setup": async function ({ config, command, updateConfig }) {
+       const environment = command;
+ 
+-      const isSsrBuild = command === "build" && !!config.adapter;
++      const isSsrBuild = command === "build" && !!config.adapter && config.output === 'server';
+ 
+       let projectBase = path.normalize(config.base);
+ 

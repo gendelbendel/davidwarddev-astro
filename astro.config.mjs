@@ -4,6 +4,7 @@ import { astroImageTools } from "astro-imagetools";
 import rehypePrettyCode from "rehype-pretty-code";
 import mdx from "@astrojs/mdx";
 import compress from "astro-compress";
+import vercel from "@astrojs/vercel/static";
 
 const prettyCodeOptions = {
   theme: "dark-plus",
@@ -41,4 +42,6 @@ export default defineConfig({
     syntaxHighlight: false,
   },
   site: "https://davidward.dev/",
+  output: "static",
+  adapter: vercel({ analytics: true }),
 });
