@@ -14,9 +14,10 @@ const getImageUrl = async (url) => {
   const fullOGImage = await renderPicture({
     src: url && !url.endsWith(".svg") ? url : "/android-chrome-192x192.png",
     alt: "The blog posts' image",
+    format: ["png"],
   });
 
-  const regex = /src="([^"]*)"/;
+  const regex = /src="([^"]*\.png)"/;
   const match = fullOGImage.picture.match(regex);
   const imageUrl = match ? match[1] : url;
   return imageUrl;
