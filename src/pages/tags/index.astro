@@ -11,9 +11,10 @@ const tags = [
 ].sort();
 
 const pageTitle = "Tags";
+const description = "All tags used in posts";
 ---
 
-<BaseLayout pageTitle={pageTitle}>
+<BaseLayout meta={{ title: pageTitle, description }}>
   <div class="tags">
     {
       tags.map((tag) => (

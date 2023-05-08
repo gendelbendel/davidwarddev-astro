@@ -2,7 +2,6 @@
 title: "Finding niche bugs, and fixing them"
 pubDate: 2023-04-18
 description: "Found a bug in a rehype plugin. Let's dive into what happened and how I fixed it."
-author: "David Ward"
 image:
   url: "https://astro.build/assets/press/astro-logo-dark.svg"
   alt: "The Astro logo"
@@ -107,9 +106,7 @@ You will _not_ observe the bug: the second line (labeled `4) is not highlighted,
 I found where the issue was: There was a regex that was a little too greedy and not taking into account the newly added `showLineNumbers` feature:
 
 ```js {2} showLineNumbers{200}
-const lineNumbers = meta 
-  ? rangeParser(meta.match(/{(.*)}/)?.[1] ?? "") 
-  : [];
+const lineNumbers = meta ? rangeParser(meta.match(/{(.*)}/)?.[1] ?? "") : [];
 ```
 
 ## The fix

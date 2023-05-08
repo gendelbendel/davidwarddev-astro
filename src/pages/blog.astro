@@ -10,10 +10,12 @@ import { filterDraft } from "../utils/filterDraft";
 const allPosts = await getCollection("posts");
 const noDraftPosts = allPosts.filter(filterDraft);
 const sortedPosts = noDraftPosts.sort(sortPostByPubDate(true));
+
 const pageTitle = "Blog";
+const description = "All posts by me";
 ---
 
-<BaseLayout pageTitle={pageTitle}>
+<BaseLayout meta={{ title: pageTitle, description }}>
   <h2>Posts</h2>
   <ul>
     {

@@ -22,7 +22,7 @@ const recentlyUpdatedPosts = noDraftPosts
 const pageTitle = "Home";
 ---
 
-<BaseLayout pageTitle={pageTitle}>
+<BaseLayout meta={{ title: pageTitle }}>
   <h2>Hey! I'm {identity.firstName}!</h2>
   <p>Find out more <a href="/about">about me here.</a></p>
   <h2>Recently Added Posts</h2>
