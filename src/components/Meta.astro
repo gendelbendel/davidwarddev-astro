@@ -10,14 +10,23 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
 // Generate meta image
 // I don't necessarily like this, but I don't know a better proper way
-const fullOGImage = await renderPicture({
-  src: ogImage ? ogImage : "/android-chrome-512x512.png",
-  alt: "The blog posts' image",
-});
 
-const regex = /src="([^"]*)"/;
-const match = fullOGImage.picture.match(regex);
-const ogImageUrl = match ? match[1] : null;
+const getImageUrl = async (url) => {
+  if (url && url.endsWith(".svg")) {
+    return url;
+  }
+  const fullOGImage = await renderPicture({
+    src: ogImage ? ogImage : "/android-chrome-512x512.png",
+    alt: "The blog posts' image",
+  });
+
+  const regex = /src="([^"]*)"/;
+  const match = fullOGImage.picture.match(regex);
+  const imageUrl = match ? match[1] : url;
+  return imageUrl;
+};
+
+const ogImageUrl = await getImageUrl(ogImage);
 ---
 
 <meta charset="utf-8" />
