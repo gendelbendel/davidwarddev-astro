@@ -17,7 +17,7 @@ const getImageUrl = async (url) => {
     format: ["png"],
   });
 
-  const regex = /src="([^"]*\.png)"/;
+  const regex = /srcset="([^"]*\.png)"/;
   const match = fullOGImage.picture.match(regex);
   const imageUrl = match ? match[1] : url;
   return imageUrl;
