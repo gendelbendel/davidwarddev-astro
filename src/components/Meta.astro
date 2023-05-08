@@ -20,7 +20,7 @@ const getImageUrl = async (url) => {
   // Regex to get everything inside the quotes
   const regex1 = /srcset="([^"]+)"/;
   const match1 = fullOGImage.picture.match(regex1);
-  let result = null;
+  let result = "";
 
   if (match1) {
     // Regex to find the last url ending in .png
@@ -31,10 +31,12 @@ const getImageUrl = async (url) => {
     }
   }
 
-  return result;
+  return new URL(result, Astro.url);
 };
 
 const ogImageUrl = await getImageUrl(ogImage);
+
+console.log();
 ---
 
 <meta charset="utf-8" />
