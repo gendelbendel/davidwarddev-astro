@@ -15,13 +15,16 @@
     "@astrojs/preact": "^2.1.0",
     "@astrojs/rss": "^2.3.2",
     "@astrojs/vercel": "^3.3.0",
+    "@resvg/resvg-js": "^2.4.1",
     "astro": "^2.4.2",
     "astro-compress": "^1.1.36",
     "astro-imagetools": "^0.8.1",
     "date-fns": "^2.29.3",
     "patch-package": "^7.0.0",
     "preact": "^10.13.2",
-    "rehype-pretty-code": "^0.9.5"
+    "rehype-pretty-code": "^0.9.5",
+    "satori": "^0.7.4",
+    "satori-html": "^0.3.2"
   },
   "devDependencies": {
     "simple-icons": "^8.10.0"

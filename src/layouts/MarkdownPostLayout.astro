@@ -1,5 +1,5 @@
 ---
-const { frontmatter, headings } = Astro.props;
+const { frontmatter, headings, slug } = Astro.props;
 import { siteConfig } from "../siteconfig";
 import { Picture } from "astro-imagetools/components";
 import BaseLayout from "./BaseLayout.astro";
@@ -7,6 +7,7 @@ import TableOfContents from "../components/RightSidebar/TableOfContents.astro";
 import DateFormat from "../components/DateFormat.astro";
 
 const author = frontmatter.author ? frontmatter.author : siteConfig.author;
+const realOgImage = `/og-image/${slug}.png`;
 ---
 
 <BaseLayout
@@ -14,6 +15,7 @@ const author = frontmatter.author ? frontmatter.author : siteConfig.author;
     title: frontmatter.title,
     description: frontmatter.description,
     ogImage: frontmatter.image.url,
+    realOgImage,
     articleDate: frontmatter.pubDate,
     author,
   }}

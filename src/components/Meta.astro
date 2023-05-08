@@ -2,7 +2,8 @@
 import { siteConfig } from "../siteconfig";
 import { renderPicture } from "astro-imagetools/api";
 
-const { title, description, ogImage, articleDate, author } = Astro.props;
+const { title, description, ogImage, realOgImage, articleDate, author } =
+  Astro.props;
 
 const titleSeparator = "-";
 const siteTitle = `${title} ${titleSeparator} ${siteConfig.title}`;
@@ -10,7 +11,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
 // Generate meta image
 // I don't necessarily like this, but I don't know a better proper way
-const getImageUrl = async (url) => {
+const getImageUrl = async (url, astroUrl) => {
   const fullOGImage = await renderPicture({
     src: url && !url.endsWith(".svg") ? url : "/android-chrome-512x512.png",
     alt: "The blog posts' image",
@@ -31,10 +32,12 @@ const getImageUrl = async (url) => {
     }
   }
 
-  return new URL(result, Astro.url);
+  return new URL(result, astroUrl);
 };
 
-const ogImageUrl = await getImageUrl(ogImage);
+const ogImageUrl = await getImageUrl(ogImage, Astro.url);
+
+const trueOgImageUrl = new URL(realOgImage, Astro.url);
 
 console.log();
 ---
@@ -70,7 +73,7 @@ console.log();
 <meta property="og:url" content={canonicalURL} />
 <meta property="og:site_name" content={siteConfig.title} />
 <meta property="og:locale" content={siteConfig.ogLocale} />
-<meta property="og:image" content={ogImageUrl} />
+<meta property="og:image" content={trueOgImageUrl} />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 {
@@ -87,7 +90,7 @@ console.log();
 <meta property="twitter:url" content={canonicalURL} />
 <meta property="twitter:title" content={title} />
 <meta property="twitter:description" content={description} />
-<meta property="twitter:image" content={ogImageUrl} />
+<meta property="twitter:image" content={trueOgImageUrl} />
 
 <!-- RSS auto-discovery -->
 <link

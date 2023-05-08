@@ -18,6 +18,10 @@ const { entry } = Astro.props;
 const { Content, headings } = await entry.render();
 ---
 
-<MarkdownPostLayout frontmatter={entry.data} headings={headings}>
+<MarkdownPostLayout
+  frontmatter={entry.data}
+  headings={headings}
+  slug={entry.slug}
+>
   <Markdown Content={Content} />
 </MarkdownPostLayout>

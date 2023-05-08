@@ -14,6 +14,7 @@ const postsCollection = defineCollection({
       alt: z.string(),
     }),
     tags: z.array(z.string()),
+    ogImage: z.string().optional(),
   }),
 });
 // Export a single `collections` object to register your collection(s)

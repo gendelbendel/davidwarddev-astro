@@ -44,4 +44,9 @@ export default defineConfig({
   site: "https://davidward.dev/",
   output: "static",
   adapter: vercel({ analytics: true }),
+  vite: {
+    optimizeDeps: {
+      exclude: ["@resvg/resvg-js", "astro"],
+    },
+  },
 });
