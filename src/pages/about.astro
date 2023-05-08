@@ -5,6 +5,6 @@ import AboutMe from "../components/About/AboutMe.astro";
 const pageTitle = "About Me";
 ---
 
-<BaseLayout pageTitle={pageTitle}>
+<BaseLayout meta={{ title: pageTitle, description: pageTitle }}>
   <AboutMe />
 </BaseLayout>

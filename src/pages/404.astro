@@ -4,7 +4,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 const pageTitle = "Oops! Page not found";
 ---
 
-<BaseLayout pageTitle={pageTitle}>
+<BaseLayout meta={{ title: pageTitle, description: pageTitle }}>
   <div>
     <p>
       Somehow, you got here. Sorry about that! Feel free to use the navigation

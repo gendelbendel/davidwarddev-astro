@@ -1,0 +1,98 @@
+---
+import { siteConfig } from "../siteconfig";
+import { renderPicture } from "astro-imagetools/api";
+
+const { title, description, ogImage, articleDate, author } = Astro.props;
+
+const titleSeparator = "-";
+const siteTitle = `${title} ${titleSeparator} ${siteConfig.title}`;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+
+// Generate meta image
+// I don't necessarily like this, but I don't know a better proper way
+const getImageUrl = async (url) => {
+  const fullOGImage = await renderPicture({
+    src: url && !url.endsWith(".svg") ? url : "/android-chrome-192x192.png",
+    alt: "The blog posts' image",
+    format: ["png"],
+  });
+
+  // Regex to get everything inside the quotes
+  const regex1 = /srcset="([^"]+)"/;
+  const match1 = fullOGImage.picture.match(regex1);
+  let result = "";
+
+  if (match1) {
+    // Regex to find the last url ending in .png
+    const regex2 = /[^,\s]+\.png\b/g;
+    const urls = match1[1].match(regex2);
+    if (urls) {
+      result = urls[urls.length - 1];
+    }
+  }
+
+  return new URL(result, Astro.url);
+};
+
+const ogImageUrl = await getImageUrl(ogImage);
+
+console.log();
+---
+
+<meta charset="utf-8" />
+
+<!-- Mobile stuff -->
+<meta content="yes" name="mobile-web-app-capable" />
+<meta content="yes" name="apple-mobile-web-app-capable" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
+/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+<!-- Icons / Favicon -->
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />
+<link rel="canonical" href={canonicalURL} />
+
+<!-- Primary Meta Tags -->
+<title>{siteTitle}</title>
+<meta name="title" content={siteTitle} />
+<meta name="description" content={description} />
+<meta name="author" content={siteConfig.author} />
+<meta name="generator" content={Astro.generator} />
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content={articleDate ? "article" : "website"} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonicalURL} />
+<meta property="og:site_name" content={siteConfig.title} />
+<meta property="og:locale" content={siteConfig.ogLocale} />
+<meta property="og:image" content={ogImageUrl} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+{
+  articleDate && (
+    <>
+      <meta property="article:author" content={author} />
+      <meta property="article:published_time" content={articleDate} />
+    </>
+  )
+}
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:url" content={canonicalURL} />
+<meta property="twitter:title" content={title} />
+<meta property="twitter:description" content={description} />
+<meta property="twitter:image" content={ogImageUrl} />
+
+<!-- RSS auto-discovery -->
+<link
+  rel="alternate"
+  type="application/rss+xml"
+  title={siteConfig.title}
+  href="/rss.xml"
+/>

@@ -1,0 +1,21 @@
+{
+  "name": "davidward.dev",
+  "short_name": "davidward.dev",
+  "description": "David Ward's personal site and blog dedicated to all things software testing, development, and more.",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "theme_color": "#2bbc8a",
+  "background_color": "#1d1f21",
+  "display": "standalone"
+}
