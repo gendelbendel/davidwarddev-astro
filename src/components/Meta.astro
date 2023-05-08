@@ -12,7 +12,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 // I don't necessarily like this, but I don't know a better proper way
 const getImageUrl = async (url) => {
   const fullOGImage = await renderPicture({
-    src: url && !url.endsWith(".svg") ? url : "/android-chrome-192x192.png",
+    src: url && !url.endsWith(".svg") ? url : "/android-chrome-512x512.png",
     alt: "The blog posts' image",
     format: ["png"],
   });
