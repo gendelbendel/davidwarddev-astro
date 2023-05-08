@@ -17,10 +17,21 @@ const getImageUrl = async (url) => {
     format: ["png"],
   });
 
-  const regex = /srcset="([^"]*\.png)"/;
-  const match = fullOGImage.picture.match(regex);
-  const imageUrl = match ? match[1] : url;
-  return imageUrl;
+  // Regex to get everything inside the quotes
+  const regex1 = /srcset="([^"]+)"/;
+  const match1 = fullOGImage.picture.match(regex1);
+  let result = null;
+
+  if (match1) {
+    // Regex to find the last url ending in .png
+    const regex2 = /[^,\s]+\.png\b/g;
+    const urls = match1[1].match(regex2);
+    if (urls) {
+      result = urls[urls.length - 1];
+    }
+  }
+
+  return result;
 };
 
 const ogImageUrl = await getImageUrl(ogImage);
