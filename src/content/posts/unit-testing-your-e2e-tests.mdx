@@ -306,7 +306,7 @@ Now, we want to see why our function appears to be failing tests that, as far as
 
 Let's first just grab what our items actually are, to observe if perhaps the way we are getting items back is problematic. Then, we will write tests against that data.
 
-We can do this with three simple steps:
+We can do this with four simple steps:
 
 1. Add a temporary `console.log()` to our spec,
 2. Changing our `wdio.conf.js` logging to only `error` for easy visibility
@@ -858,8 +858,8 @@ So, lets make a quick change and run our unit tests:
  * @returns true if array is sorted highest to lowest, false otherwise
  */
 const isSortedHiToLow = (arr) =>
-  -arr.every((val, index, arr) => !index || arr[index - 1] > val);
-+arr.every((val, index, arr) => !index || arr[index - 1] >= val);
+-  arr.every((val, index, arr) => !index || arr[index - 1] > val);
++  arr.every((val, index, arr) => !index || arr[index - 1] >= val);
 
 /**
  *
@@ -867,8 +867,8 @@ const isSortedHiToLow = (arr) =>
  * @returns true if array is sorted lowest to highest, false otherwise
  */
 const isSortedLowToHi = (arr) =>
-  -arr.every((val, index, arr) => !index || arr[index - 1] < val);
-+arr.every((val, index, arr) => !index || arr[index - 1] <= val);
+-  arr.every((val, index, arr) => !index || arr[index - 1] < val);
++  arr.every((val, index, arr) => !index || arr[index - 1] <= val);
 
 module.exports = {
   isSortedHiToLow,
