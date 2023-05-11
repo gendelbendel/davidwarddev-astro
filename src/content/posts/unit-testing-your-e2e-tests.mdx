@@ -1,7 +1,7 @@
 ---
 title: "Unit testing your e2e tests"
 pubDate: 2023-05-10
-draft: true
+draft: false
 description: "'Treat your test code like production code' is a really common saying. Lets tackle one facet of that rule: unit testing your e2e tests."
 image:
   url: "/src/assets/unit-testing-your-e2e-tests/unit-testing.png"
@@ -321,7 +321,7 @@ tests.forEach((test) => {
     await InventoryPage.sortBy(test.sortBy);
 
     const items = await test.items();
-+    console.log(items);
+    +console.log(items);
 
     await expect(test.predicate(items)).toBe(true);
   });
@@ -330,7 +330,7 @@ tests.forEach((test) => {
 
 ### 2. Update wdio.conf.js
 
-```js 
+```js
 -logLevel: 'info',
 +logLevel: 'error',
 ```
@@ -367,7 +367,7 @@ In the console output, we get the following arrays (with added comments):
 [7.99, 9.99, 15.99, 15.99, 29.99, 49.99]
 ```
 
-So with that data in hand, let's add a couple more tests! 
+So with that data in hand, let's add a couple more tests!
 
 ### 3. Adding tests
 
@@ -431,11 +431,12 @@ Follow along with the commit for this phase [here.](https://github.com/gendelben
 So in our current tests, we are making a few assumptions as to what is acceptable data and what is not. So lets try to think about what assumptions we are making, so we can begin testing against them.
 
 A non-comprehensive list of assumptions:
-1. We were only using one data type: ints. Once we introduced floats, the issues appear. 
+
+1. We were only using one data type: ints. Once we introduced floats, the issues appear.
    - Idea: Is the issue related to floats?
-2. We know we use strings in this function, but we are not testing for it. 
+2. We know we use strings in this function, but we are not testing for it.
    - Idea: Are strings actually safe?
-3. We were only using arrays with a length of 2 elements. Once we introduced arrays with more than 2 elements, issues appeared. 
+3. We were only using arrays with a length of 2 elements. Once we introduced arrays with more than 2 elements, issues appeared.
    - Idea: Is the issue related to array length?
 4. We were only testing against arrays with unique elements. Once we introduced arrays with duplicate elements, issues appeared.
    - Idea: Is the issue related to array uniqueness?
@@ -857,8 +858,8 @@ So, lets make a quick change and run our unit tests:
  * @returns true if array is sorted highest to lowest, false otherwise
  */
 const isSortedHiToLow = (arr) =>
--  arr.every((val, index, arr) => !index || arr[index - 1] > val);
-+  arr.every((val, index, arr) => !index || arr[index - 1] >= val);
+  -arr.every((val, index, arr) => !index || arr[index - 1] > val);
++arr.every((val, index, arr) => !index || arr[index - 1] >= val);
 
 /**
  *
@@ -866,8 +867,8 @@ const isSortedHiToLow = (arr) =>
  * @returns true if array is sorted lowest to highest, false otherwise
  */
 const isSortedLowToHi = (arr) =>
--  arr.every((val, index, arr) => !index || arr[index - 1] < val);
-+  arr.every((val, index, arr) => !index || arr[index - 1] <= val);
+  -arr.every((val, index, arr) => !index || arr[index - 1] < val);
++arr.every((val, index, arr) => !index || arr[index - 1] <= val);
 
 module.exports = {
   isSortedHiToLow,
@@ -898,23 +899,25 @@ Drumroll please.
 While this article is quite lengthy, the code in question is more terse.
 
 Find the pull request and each individual commit [here](https://github.com/gendelbendel/saucedemo-wdio/pull/1).
+
 ## Where to go from here?
 
 This example may have been a trivial one, but we went from having zero unit test coverage to having 34 unique tests, and we really only covered a few assumptions that we had been making before. There's still a ton of room for more tests that could be written.
 
 For example:
+
 1. What happens if the array being supplied is of type `boolean{:js}`?
 2. What happens if the array has multiple different types (like a mixture of floats, ints, and strings?)
 3. What happens if the array is empty?
 4. What happens if the array is duplicates, but of different types (like `[1, 1.0, "1", "1.0"]{:js}`)?
 
-We've really only scratched the surface... and these functions are, again, quite trivial. 
+We've really only scratched the surface... and these functions are, again, quite trivial.
 
 ## Final notes
 
 As your code grows in complexity, so does your potential for errors. Unit testing your code is one way to help cover for those issues, but is not the only way.
 
-There's a lot of duplication of code in our unit tests, which can be one area where that complexity can come in. The only real things changing is the data going in, and the expectation of results. Similar to how we generate tests within `test/specs/e2e/inventory.e2e.js`, we can also generate unit tests and simplify our code. 
+There's a lot of duplication of code in our unit tests, which can be one area where that complexity can come in. The only real things changing is the data going in, and the expectation of results. Similar to how we generate tests within `test/specs/e2e/inventory.e2e.js`, we can also generate unit tests and simplify our code.
 
 This mindset of testing your tests that are testing your tests can go as deep as you want to go. And perhaps, I'll write another post going into what that world looks like.
 
