@@ -17,6 +17,16 @@ const prettyCodeOptions = {
         },
       ];
     }
+    // Add deleted/inserted line background coloring
+    else if (node.children[0].children.length > 0) {
+      if (node.children[0].children[0].value.startsWith("-")) {
+        node.properties.className.push("deleted");
+        node.children[0].children.shift();
+      } else if (node.children[0].children[0].value.startsWith("+")) {
+        node.properties.className.push("inserted");
+        node.children[0].children.shift();
+      }
+    }
   },
   onVisitHighlightedLine(node) {
     node.properties.className.push("highlighted");

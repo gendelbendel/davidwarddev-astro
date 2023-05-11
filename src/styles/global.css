@@ -259,6 +259,28 @@ code > .highlighted::before {
   border-left-style: solid;
 }
 
+code > .deleted {
+  background-color: rgba(222, 52, 10, 0.412);
+}
+
+code > .deleted::before {
+  border-left-color: #d01212;
+  border-left-width: 3px;
+  border-left-style: solid;
+  counter-increment: line;
+  content: "-";
+}
+
+code > .inserted {
+  background-color: rgba(25, 164, 12, 0.279);
+}
+
+code > .inserted::before {
+  border-left-color: #60fa63;
+  border-left-width: 3px;
+  border-left-style: solid;
+}
+
 .container {
   max-width: 1050px;
   margin: 0 auto;
