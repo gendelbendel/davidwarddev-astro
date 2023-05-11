@@ -1,0 +1,921 @@
+---
+title: "Unit testing your e2e tests"
+pubDate: 2023-05-10
+draft: true
+description: "'Treat your test code like production code' is a really common saying. Lets tackle one facet of that rule: unit testing your e2e tests."
+image:
+  url: "/src/assets/unit-testing-your-e2e-tests/unit-testing.png"
+  alt: "An image of failing unit test results"
+tags: ["blogging", "development", "testing"]
+coauthor: "Chris Kenst"
+---
+
+import { Picture } from "astro-imagetools/components";
+
+> This article was written in collaboration with [Chris Kenst](https://kenst.com), another software testing professional, who provided assistence with some of the structure and organization of this post.
+>
+> He was my manager when we worked together at [Promenade](https://getpromenade.com/), where he allowed me to spend time writing e2e tests that were also covered with unit tests and provided ample amounts of feedback throughout my time there.
+>
+> Go check out his work as well!
+
+## Treat your test code like production code
+
+You've heard that phrase before. "Treat your test code like production code". Maybe once, maybe twice, maybe countless times.
+
+Everyone says it's a good idea. Some people even describe what it means!
+
+For fun, let's hear what ChatGPT has to say about the topic:
+
+> "Treating test code like production code means applying the same level of care and attention to detail when writing and maintaining tests as you would for production code. This helps ensure that your tests are reliable, maintainable, and provide accurate feedback about the quality of your application."
+
+Ultimately, treating test code like production code is about _recognizing the importance of testing in the software development process, including the testing process itself_. By investing in high quality tests, you can improve the overall quality of your application, increase your confidence in its behavior, and ensure a better user experience for your customers.
+
+Let's briefly go over what some criteria of "reliable, maintainable" tests might look like:
+
+- Stored in version control
+- Run in a CI/CD pipeline
+- Reusable code
+- Pass in CI reliably
+- Are themselves covered by unit tests
+
+## "Wait... repeat that last one?"
+
+That's right. Unit tests for your e2e tests. Tests testing your tests.
+
+> And before you ask, no, we won't go deeper into the abyss (i.e. no tests testing tests testing tests). At least not yet.
+
+## The benefits of testing your tests
+
+### Faster feedback
+
+Unit tests are typically faster to run than e2e tests, as they don't require the entire application to be set up and run. By writing unit tests for the individual components of your e2e tests, you can get feedback on code changes more quickly, which can help you catch and fix issues earlier in the development cycle.
+
+### Isolation of issues
+
+If you encounter an issue in your e2e tests, it can be challenging to determine where the problem lies. By writing unit tests for the individual components of your e2e tests, you can isolate issues to specific parts of the application, which can make it easier to debug and fix issues.
+
+### Increased confidence
+
+Writing unit tests for your e2e tests can give you more confidence that your e2e tests are accurate and reliable. By verifying the individual components of your e2e tests with unit tests, you can ensure that your e2e tests are testing the right things and that they're providing accurate feedback about the quality of your application.
+
+### Better maintainability
+
+e2e tests can be complex and difficult to maintain, especially as your application grows and changes over time. By breaking down your e2e tests into smaller, more manageable components, you can make them easier to maintain and update as your application evolves.
+
+## "Wait, that sounds familiar..."
+
+That's because for every heading under the ["The Benefits of testing your tests"](#the-benefits-of-testing-your-tests) section, replace the phrase "e2e tests" with "product"/"software project"/"entire codebase", or what have you, and it's _almost_ a perfect match for what you'd probably be saying if you were consulting as a test engineer on a project without unit tests and needed to sell the idea to the engineering organization.
+
+It all applies to us testers, as well.
+
+## "I'm still not sold"
+
+Allow me to introduce you to some fun then: An example project and a hypothetical situation, that we're going to play out together for the rest of the article.
+
+## The project
+
+Our journey begins [here.](https://github.com/gendelbendel/saucedemo-wdio/tree/a0874e213b39a7fae5aa26e32813c6573e17cdc4). This is a project I've created which uses the tool Webdriver.io to test a demo website I'm sure you've also seen before: https://www.saucedemo.com
+
+That link specifically targets a commit in the project, where we will begin our exercise.
+
+## Phase 1: Setting up
+
+1. Clone the project `git clone git@github.com:gendelbendel/saucedemo-wdio.git`
+2. Checkout the beginning commit `git checkout a0874e2`
+3. run `npm i`
+4. run `npm run wdio:inventory`
+
+If that setup all worked... Well, the tests will fail. Dang! What seems to be the problem?
+
+Let's first take a look at the spec file that seems to be failing and see what it is that it is doing.
+
+### The e2e spec
+
+Source of this `test/specs/e2e/inventory.e2e.js` for our current commit can be found [here](https://github.com/gendelbendel/saucedemo-wdio/blob/a0874e213b39a7fae5aa26e32813c6573e17cdc4/test/specs/e2e/inventory.e2e.js)
+
+```js title="test/specs/e2e/inventory.e2e.js" showLineNumbers {45}
+const LoginPage = require("../../pageobjects/login.page");
+const InventoryPage = require("../../pageobjects/inventory.page");
+const util = require("../../../lib/util");
+const config = require("config");
+
+describe("Inventory", () => {
+  beforeEach(async () => {
+    await LoginPage.open();
+
+    await LoginPage.login(
+      config.users.standard.user,
+      config.users.standard.pass
+    );
+  });
+  context("sorting", async () => {
+    // To add a new sorting test, add new criteria here
+    const tests = [
+      {
+        sortBy: "Name (A to Z)",
+        predicate: util.isSortedLowToHi,
+        items: () => InventoryPage.inventoryItemsNames(),
+      },
+      {
+        sortBy: "Name (Z to A)",
+        predicate: util.isSortedHiToLow,
+        items: () => InventoryPage.inventoryItemsNames(),
+      },
+      {
+        sortBy: "Price (low to high)",
+        predicate: util.isSortedLowToHi,
+        items: () => InventoryPage.inventoryItemsPrices(),
+      },
+      {
+        sortBy: "Price (high to low)",
+        predicate: util.isSortedHiToLow,
+        items: () => InventoryPage.inventoryItemsPrices(),
+      },
+    ];
+    tests.forEach((test) => {
+      it(`should sort by "${test.sortBy}"`, async () => {
+        await InventoryPage.sortBy(test.sortBy);
+
+        const items = await test.items();
+
+        await expect(test.predicate(items)).toBe(true);
+      });
+    });
+  });
+});
+```
+
+### Explaination of the e2e spec
+
+If we dig into this code, this is the behavior pathing of the code that we see:
+
+1. We enter `beforeEach` and open up the login page, then login as an authorized user.
+2. We generate a list of tests we want to create:
+
+   1. A value for `sortBy`, which is equal to `"Name (A to Z)"`, which corresponds to both the name of the test and to determine how to sort the products on the page. We can see that here:
+
+      <Picture
+        src="/src/assets/unit-testing-your-e2e-tests/name-a-z.png"
+        alt="saucedemo sorting select list"
+      />
+
+   2. A `predicate`, which is a function we have created to make a decision as to whether the values we received from the website are correct or not, which we set to a `util.isSortedLowToHi{:js}` function
+   3. An `items` property, which is how we retrieve the items to make a comparison for.
+   4. Repeat for each item in the array, with their corresponding values.
+
+3. For each of these tests:
+   1. We go to the [InventoryPage](https://www.saucedemo.com/inventory.html)
+   2. We grab the list of items we need (either an array of names or an array of prices, depending on the test)
+   3. We run our predicate function against those items to determine if they are sorted in the manner we expect.
+   4. We assert on that result.
+
+The key point here is that we have some custom logic to determine whether the data we have matches some criteria, which is in a `lib/util.js` file we have created. Remember this for later.
+
+Let's look at a manual exploration of the product under test, to see if we can see with our own eyes what behavior is being exhibited, to see if our tests have found a bug, or if our tests are bugged themselves.
+
+### Manual exploration
+
+If you browse to https://saucedemo.com, login with `standard_user` and `secret_sauce` as the username and password combo, you're greeted with the product inventory screen.
+
+You'll notice that all of the products are by default sorted by `Name (A to Z)`. If you look at the names of the products in left to right order, you will observe that this is indeed correct behavior.
+
+<Picture
+  src="/src/assets/unit-testing-your-e2e-tests/products-a-z.png"
+  alt="an image of the saucedemo products sorting from a to z"
+/>
+
+Click on the sorting select menu and choose `Price (high to low)`.
+
+You'll notice that the product ordering shifts to respect the new sorting, and if you pay close attention to the prices of each product, they do indeed get ordered correctly from highest priced item first, to lowest price item last.
+
+<Picture
+  src="/src/assets/unit-testing-your-e2e-tests/products-price-hi-low.png"
+  alt="an image of the saucedemo products sorting from price high to low"
+/>
+
+So, the product under test appears good.
+
+We've determined that the app does indeed appear to be respecting the sorting behavior and there is no bug there, but our test says otherwise. That suggests that our tests may in fact be the problem here.
+
+So we should start by looking at _what it is that is determining whether our test is correct or incorrect_. In the case of our project, what makes that decision is the functions inside of `lib/util.js`.
+
+So, we investigate.
+
+### Explaination of `lib/util.js`
+
+Source of this `lib/util.js` on our current commit can be found [here](https://github.com/gendelbendel/saucedemo-wdio/blob/a0874e213b39a7fae5aa26e32813c6573e17cdc4/lib/util.js).
+
+```js title="lib/util.js" showLineNumbers
+/**
+ *
+ * @param {any[]} arr array of values to check
+ * @returns true if array is sorted highest to lowest, false otherwise
+ */
+const isSortedHiToLow = (arr) =>
+  arr.every((val, index, arr) => !index || arr[index - 1] > val);
+
+/**
+ *
+ * @param {any[]} arr array of values to check
+ * @returns true if array is sorted lowest to highest, false otherwise
+ */
+const isSortedLowToHi = (arr) =>
+  arr.every((val, index, arr) => !index || arr[index - 1] < val);
+
+module.exports = {
+  isSortedHiToLow,
+  isSortedLowToHi,
+};
+```
+
+So these functions will iterate over every item in the list and compare it to the previous one using Javascript's built in operators.
+
+Side note: These functions say they accept `any[]` as a data type, but that's not quite true, so don't try using them with all data types, just ones that implement comparison with the various built in operators.
+
+### Our very first unit test
+
+Source of our `test/specs/unit/util.unit.js` file on our current commit can be found [here](https://github.com/gendelbendel/saucedemo-wdio/blob/a0874e213b39a7fae5aa26e32813c6573e17cdc4/test/specs/unit/util.unit.js)
+
+It is quite uneventful for now.
+
+```js showLineNumbers title="test/specs/unit/util.unit.js"
+const { expect } = require("chai");
+
+const util = require("../../../lib/util");
+
+describe("util.js", () => {
+  context("isSortedHiToLow()", () => {});
+  context("isSortedLowToHi()", () => {});
+});
+```
+
+We require `chai` so we can use the `expect` assertions later. And we have two different contexts: One for `isSortedHiToLow` and `isSortedLowToHi` which will contain tests for each of these functions in `lib/util.js` respectively.
+
+## Phase 2: Basic unit tests
+
+Now we just want to see what it looks like to have unit tests and run them against our functions.
+
+[Here's](https://github.com/gendelbendel/saucedemo-wdio/commit/39edcca65939413b6a22ef13ca51d4fe72f41f65) the full commit for that.
+
+Feel free to `git checkout 39edcca` and then run `npm run unit`.
+
+```js title="test/specs/unit/util.unit.js"
+const util = require('../../../lib/util');
+
+describe('util.js', () => {
+-  context('isSortedHiToLow()', () => {});
+-  context('isSortedLowToHi()', () => {});
++  context('isSortedHiToLow()', () => {
++    it('returns false when list is ascending', () => {
++      const list = [123, 456];
++      const result = util.isSortedHiToLow(list);
++      expect(result).to.equal(false);
++    });
++    it('returns true when list is descending', () => {
++      const list = [456, 123];
++      const result = util.isSortedHiToLow(list);
++      expect(result).to.equal(true);
++    });
++  });
++  context('isSortedLowToHi()', () => {
++    it('returns true when list is ascending', () => {
++      const list = [123, 456];
++      const result = util.isSortedLowToHi(list);
++      expect(result).to.equal(true);
++    });
++    it('returns false when list is descending', () => {
++      const list = [456, 123];
++      const result = util.isSortedLowToHi(list);
++      expect(result).to.equal(false);
++    });
++  });
+});
+```
+
+Now we've added two basic tests to each function: An array of two values, and each test with a reversed order for these elements.
+
+If we run these tests, we will see that they all run against our `lib/util.js` code and all pass successfully. This is useful information, so we know that we can proceed with the next steps.
+
+## Phase 3: Writing tests against observed data
+
+Follow along with [this commit](https://github.com/gendelbendel/saucedemo-wdio/commit/44f696a83bce8e12823d28a3bcad698ddc8eda88)
+
+`git checkout 44f696a`
+
+Now, we want to see why our function appears to be failing tests that, as far as we can see, should indeed be passing.
+
+Let's first just grab what our items actually are, to observe if perhaps the way we are getting items back is problematic. Then, we will write tests against that data.
+
+We can do this with three simple steps:
+
+1. Add a temporary `console.log()` to our spec,
+2. Changing our `wdio.conf.js` logging to only `error` for easy visibility
+3. Running the tests to get our outputs.
+4. Write the additional tests
+
+### 1. Add a console.log
+
+```js title="test/specs/e2e/inventory.e2e.js" showLineNumbers{39}
+tests.forEach((test) => {
+  it(`should sort by "${test.sortBy}"`, async () => {
+    await InventoryPage.sortBy(test.sortBy);
+
+    const items = await test.items();
++    console.log(items);
+
+    await expect(test.predicate(items)).toBe(true);
+  });
+});
+```
+
+### 2. Update wdio.conf.js
+
+```js 
+-logLevel: 'info',
++logLevel: 'error',
+```
+
+### 3. Run the tests for data
+
+In the console output, we get the following arrays (with added comments):
+
+```js
+// Name (A - Z)
+[
+  'Sauce Labs Backpack',
+  'Sauce Labs Bike Light',
+  'Sauce Labs Bolt T-Shirt',
+  'Sauce Labs Fleece Jacket',
+  'Sauce Labs Onesie',
+  'Test.allTheThings() T-Shirt (Red)',
+]
+
+// Name (Z - A)
+[
+  'Test.allTheThings() T-Shirt (Red)',
+  'Sauce Labs Onesie',
+  'Sauce Labs Fleece Jacket',
+  'Sauce Labs Bolt T-Shirt',
+  'Sauce Labs Bike Light',
+  'Sauce Labs Backpack',
+]
+
+// Price (high to low)
+[49.99, 29.99, 15.99, 15.99, 9.99, 7.99]
+
+// Price (low to high)
+[7.99, 9.99, 15.99, 15.99, 29.99, 49.99]
+```
+
+So with that data in hand, let's add a couple more tests! 
+
+### 3. Adding tests
+
+Let's start just with the data that resulted in failing tests: the prices.
+
+```js title="test/specs/unit/util.unit.js" showLineNumbers
+const { expect } = require('chai');
+
+const util = require('../../../lib/util');
+
+describe('util.js', () => {
+  context('isSortedHiToLow()', () => {
+    it('returns false when list is ascending', () => {
+      const list = [123, 456];
+      const result = util.isSortedHiToLow(list);
+      expect(result).to.equal(false);
+    });
+    it('returns true when list is descending', () => {
+      const list = [456, 123];
+      const result = util.isSortedHiToLow(list);
+      expect(result).to.equal(true);
+    });
++    it('returns true when list is descending: saucedemo results', () => {
++      // Obtained via console.log on the `items` variable (in test/specs/e2e/inventory.e2e.js, Line 43)
++      // Corresponds to the value returned from the "Price (high to low)" test
++      const list = [49.99, 29.99, 15.99, 15.99, 9.99, 7.99];
++      const result = util.isSortedHiToLow(list);
++      expect(result).to.equal(true);
++    });
+  });
+  context('isSortedLowToHi()', () => {
+    it('returns true when list is ascending', () => {
+      const list = [123, 456];
+      const result = util.isSortedLowToHi(list);
+      expect(result).to.equal(true);
+    });
+    it('returns false when list is descending', () => {
+      const list = [456, 123];
+      const result = util.isSortedLowToHi(list);
+      expect(result).to.equal(false);
+    });
++    it('returns true when list is ascending: saucedemo results', () => {
++      // Obtained via console.log on the `items` variable (in test/specs/e2e/inventory.e2e.js, Line 43)
++      // Corresponds to the value returned from the "Price (low to high)" test
++      const list = [7.99, 9.99, 15.99, 15.99, 29.99, 49.99];
++      const result = util.isSortedLowToHi(list);
++      expect(result).to.equal(true);
++    });
+  });
+});
+```
+
+Now if we run `npm run unit{:bash}`... Aha! We have observed failing results. We now have data that we know for sure is causing a problem.
+
+And if we inspect these arrays, we observe that they are in fact in the correct order, which proves that there is something incorrect with our sorting function. If you've been following along closely so far, and you take a close look at `lib/util.js`, you might already know how to fix it, but let us continue.
+
+## Phase 4: Look for more reproducible results
+
+Follow along with the commit for this phase [here.](https://github.com/gendelbendel/saucedemo-wdio/commit/bea32a04d1a21485775c9910283a00977b960122)
+
+So in our current tests, we are making a few assumptions as to what is acceptable data and what is not. So lets try to think about what assumptions we are making, so we can begin testing against them.
+
+A non-comprehensive list of assumptions:
+1. We were only using one data type: ints. Once we introduced floats, the issues appear. 
+   - Idea: Is the issue related to floats?
+2. We know we use strings in this function, but we are not testing for it. 
+   - Idea: Are strings actually safe?
+3. We were only using arrays with a length of 2 elements. Once we introduced arrays with more than 2 elements, issues appeared. 
+   - Idea: Is the issue related to array length?
+4. We were only testing against arrays with unique elements. Once we introduced arrays with duplicate elements, issues appeared.
+   - Idea: Is the issue related to array uniqueness?
+
+So, lets begin testing against some of these assumptions, and look for failures.
+
+### Begin clearing up assumptions
+
+```js title="test/specs/unit/util.unit.js" showLineNumbers
+const { expect } = require('chai');
+
+const util = require('../../../lib/util');
+
+describe('util.js', () => {
+  context('isSortedHiToLow()', () => {
++    context('strings', () => {
++      it('returns false when list is alphabetical ascending', () => {
++        const list = ['abc', 'xyz'];
++        const result = util.isSortedHiToLow(list);
++        expect(result).to.equal(false);
++      });
++      it('returns true when list is alphabetical descending', () => {
++        const list = ['xyz', 'abc'];
++        const result = util.isSortedHiToLow(list);
++        expect(result).to.equal(true);
++      });
++      it('returns true when list is alphabetical descending: saucedemo results', () => {
++        // Obtained via console.log on the `items` variable (in test/specs/e2e/inventory.e2e.js, Line 43)
++        // Corresponds to the value returned from the "Name (Z to A)" test
++        const list = [
++          'Test.allTheThings() T-Shirt (Red)',
++          'Sauce Labs Onesie',
++          'Sauce Labs Fleece Jacket',
++          'Sauce Labs Bolt T-Shirt',
++          'Sauce Labs Bike Light',
++          'Sauce Labs Backpack',
++        ];
++        const result = util.isSortedHiToLow(list);
++        expect(result).to.equal(true);
++      });
++    });
++    context('ints', () => {
+      it('returns false when list is ascending', () => {
+        const list = [123, 456];
+        const result = util.isSortedHiToLow(list);
+        expect(result).to.equal(false);
+      });
+      it('returns true when list is descending', () => {
+        const list = [456, 123];
+        const result = util.isSortedHiToLow(list);
+        expect(result).to.equal(true);
+      });
++    });
++    context('floats', () => {
++      it('returns false when list is ascending', () => {
++        const list = [123.01, 456.99];
++        const result = util.isSortedHiToLow(list);
++        expect(result).to.equal(false);
++      });
++      it('returns true when list is descending', () => {
++        const list = [456.99, 123.01];
++        const result = util.isSortedHiToLow(list);
++        expect(result).to.equal(true);
++      });
+      it('returns true when list is descending: saucedemo results', () => {
+        // Obtained via console.log on the `items` variable (in test/specs/e2e/inventory.e2e.js, Line 43)
+        // Corresponds to the value returned from the "Price (high to low)" test
+        const list = [49.99, 29.99, 15.99, 15.99, 9.99, 7.99];
+        const result = util.isSortedHiToLow(list);
+        expect(result).to.equal(true);
+      });
++    });
+  });
+  context('isSortedLowToHi()', () => {
++    context('strings', () => {
++      it('returns true when list is alphabetical ascending', () => {
++        const list = ['abc', 'xyz'];
++        const result = util.isSortedLowToHi(list);
++        expect(result).to.equal(true);
++      });
++      it('returns false when list is alphabetical descending', () => {
++        const list = ['xyz', 'abc'];
++        const result = util.isSortedLowToHi(list);
++        expect(result).to.equal(false);
++      });
++      it('returns true when list is alphabetical ascending: saucedemo results', () => {
++        // Obtained via console.log on the `items` variable (in test/specs/e2e/inventory.e2e.js, Line 43)
++        // Corresponds to the value returned from the "Name (A to Z)" test
++        const list = [
++          'Sauce Labs Backpack',
++          'Sauce Labs Bike Light',
++          'Sauce Labs Bolt T-Shirt',
++          'Sauce Labs Fleece Jacket',
++          'Sauce Labs Onesie',
++          'Test.allTheThings() T-Shirt (Red)',
++        ];
++        const result = util.isSortedLowToHi(list);
++        expect(result).to.equal(true);
++      });
++    });
++    context('ints', () => {
+      it('returns true when list is ascending', () => {
+        const list = [123, 456];
+        const result = util.isSortedLowToHi(list);
+        expect(result).to.equal(true);
+      });
+      it('returns false when list is descending', () => {
+        const list = [456, 123];
+        const result = util.isSortedLowToHi(list);
+        expect(result).to.equal(false);
+      });
++    });
++    context('floats', () => {
++      it('returns true when list is ascending', () => {
++        const list = [123.01, 456.99];
++        const result = util.isSortedLowToHi(list);
++        expect(result).to.equal(true);
++      });
++      it('returns false when list is descending', () => {
++        const list = [456.99, 123.01];
++        const result = util.isSortedLowToHi(list);
++        expect(result).to.equal(false);
++      });
+      it('returns true when list is ascending: saucedemo results', () => {
+        // Obtained via console.log on the `items` variable (in test/specs/e2e/inventory.e2e.js, Line 43)
+        // Corresponds to the value returned from the "Price (low to high)" test
+        const list = [7.99, 9.99, 15.99, 15.99, 29.99, 49.99];
+        const result = util.isSortedLowToHi(list);
+        expect(result).to.equal(true);
+      });
++    });
+  });
+});
+```
+
+You'll now see we have multiple branching `contexts` organizing our code, based on the function being used as well as the data type under test.
+
+For each data type we think we should test against, we added a layer of tests for them, which includes some dummy data as well as the data we know we are receiving.
+
+Now if we run `npm run unit`... We get no additional new failures.
+
+Which assumptions did we clear up? Which ones have we still not tackled?
+
+There's one more in that list we haven't covered yet: Duplicate elements.
+
+## Phase 5: Finalizing our list of assumptions
+
+Do duplicate elements cause issues? Let's write some tests to do so.
+
+Follow along with the commit for this phase [here.](https://github.com/gendelbendel/saucedemo-wdio/commit/06f2534b022209539c27b11ff43b706079ab5b14)
+
+Feel free to `git checkout 06f2534` and `npm run unit` to see the results yourself.
+
+```js title="test/specs/unit/util.unit/js" showLineNumbers
+const { expect } = require('chai');
+
+const util = require('../../../lib/util');
+
+describe('util.js', () => {
+  context('isSortedHiToLow()', () => {
+    context('strings', () => {
+      it('returns false when list is alphabetical ascending', () => {
+        const list = ['abc', 'xyz'];
+        const result = util.isSortedHiToLow(list);
+        expect(result).to.equal(false);
+      });
++      it('returns false when list is alphabetical ascending and has duplicate elements', () => {
++        const list = ['abc', 'abc', 'xyz'];
++        const result = util.isSortedHiToLow(list);
++        expect(result).to.equal(false);
++      });
+      it('returns true when list is alphabetical descending', () => {
+        const list = ['xyz', 'abc'];
+        const result = util.isSortedHiToLow(list);
+        expect(result).to.equal(true);
+      });
++      it('returns true when list is alphabetical descending and has duplicate elements', () => {
++        const list = ['xyz', 'abc', 'abc'];
++        const result = util.isSortedHiToLow(list);
++        expect(result).to.equal(true);
++      });
++      it('returns true when list is only duplicate elements', () => {
++        const list = ['abc', 'abc'];
++        const result = util.isSortedHiToLow(list);
++        expect(result).to.equal(true);
++      });
+      it('returns true when list is alphabetical descending: saucedemo results', () => {
+        // Obtained via console.log on the `items` variable (in test/specs/e2e/inventory.e2e.js, Line 43)
+        // Corresponds to the value returned from the "Name (Z to A)" test
+        const list = [
+          'Test.allTheThings() T-Shirt (Red)',
+          'Sauce Labs Onesie',
+          'Sauce Labs Fleece Jacket',
+          'Sauce Labs Bolt T-Shirt',
+          'Sauce Labs Bike Light',
+          'Sauce Labs Backpack',
+        ];
+        const result = util.isSortedHiToLow(list);
+        expect(result).to.equal(true);
+      });
+    });
+    context('ints', () => {
+      it('returns false when list is ascending', () => {
+        const list = [123, 456];
+        const result = util.isSortedHiToLow(list);
+        expect(result).to.equal(false);
+      });
++      it('returns false when list is ascending and has duplicate elements', () => {
++        const list = [123, 123, 456];
++        const result = util.isSortedHiToLow(list);
++        expect(result).to.equal(false);
++      });
+      it('returns true when list is descending', () => {
+        const list = [456, 123];
+        const result = util.isSortedHiToLow(list);
+        expect(result).to.equal(true);
+      });
++      it('returns true when list is descending and has duplicate elements', () => {
++        const list = [456, 123, 123];
++        const result = util.isSortedHiToLow(list);
++        expect(result).to.equal(true);
++      });
++      it('returns true when list is only duplicate elements', () => {
++        const list = [123, 123];
++        const result = util.isSortedHiToLow(list);
++        expect(result).to.equal(true);
++      });
+    });
+    context('floats', () => {
+      it('returns false when list is ascending', () => {
+        const list = [123.01, 456.99];
+        const result = util.isSortedHiToLow(list);
+        expect(result).to.equal(false);
+      });
++      it('returns false when list is ascending and has duplicate elements', () => {
++        const list = [123.01, 123.01, 456.99];
++        const result = util.isSortedHiToLow(list);
++        expect(result).to.equal(false);
++      });
+      it('returns true when list is descending', () => {
+        const list = [456.99, 123.01];
+        const result = util.isSortedHiToLow(list);
+        expect(result).to.equal(true);
+      });
++      it('returns true when list is descending and has duplicate elements', () => {
++        const list = [456.99, 123.01, 123.01];
++        const result = util.isSortedHiToLow(list);
++        expect(result).to.equal(true);
++      });
++      it('returns true when list is only duplicate elements', () => {
++        const list = [123.01, 123.01];
++        const result = util.isSortedHiToLow(list);
++        expect(result).to.equal(true);
++      });
+      it('returns true when list is descending: saucedemo results', () => {
+        // Obtained via console.log on the `items` variable (in test/specs/e2e/inventory.e2e.js, Line 43)
+        // Corresponds to the value returned from the "Price (high to low)" test
+        const list = [49.99, 29.99, 15.99, 15.99, 9.99, 7.99];
+        const result = util.isSortedHiToLow(list);
+        expect(result).to.equal(true);
+      });
+    });
+  });
+  context('isSortedLowToHi()', () => {
+    context('strings', () => {
+      it('returns true when list is alphabetical ascending', () => {
+        const list = ['abc', 'xyz'];
+        const result = util.isSortedLowToHi(list);
+        expect(result).to.equal(true);
+      });
++      it('returns true when list is alphabetical ascending and has duplicate elements', () => {
++        const list = ['abc', 'abc', 'xyz'];
++        const result = util.isSortedLowToHi(list);
++        expect(result).to.equal(true);
++      });
+      it('returns false when list is alphabetical descending', () => {
+        const list = ['xyz', 'abc'];
+        const result = util.isSortedLowToHi(list);
+        expect(result).to.equal(false);
+      });
++      it('returns false when list is descending and has duplicate elements', () => {
++        const list = ['xyz', 'abc', 'abc'];
++        const result = util.isSortedLowToHi(list);
++        expect(result).to.equal(false);
++      });
++      it('returns true when list is only duplicate elements', () => {
++        const list = ['abc', 'abc'];
++        const result = util.isSortedLowToHi(list);
++        expect(result).to.equal(true);
++      });
+      it('returns true when list is alphabetical ascending: saucedemo results', () => {
+        // Obtained via console.log on the `items` variable (in test/specs/e2e/inventory.e2e.js, Line 43)
+        // Corresponds to the value returned from the "Name (A to Z)" test
+        const list = [
+          'Sauce Labs Backpack',
+          'Sauce Labs Bike Light',
+          'Sauce Labs Bolt T-Shirt',
+          'Sauce Labs Fleece Jacket',
+          'Sauce Labs Onesie',
+          'Test.allTheThings() T-Shirt (Red)',
+        ];
+        const result = util.isSortedLowToHi(list);
+        expect(result).to.equal(true);
+      });
+    });
+    context('ints', () => {
+      it('returns true when list is ascending', () => {
+        const list = [123, 456];
+        const result = util.isSortedLowToHi(list);
+        expect(result).to.equal(true);
+      });
++      it('returns true when list is ascending and has duplicate elements', () => {
++        const list = [123, 123, 456];
++        const result = util.isSortedLowToHi(list);
++        expect(result).to.equal(true);
++      });
+      it('returns false when list is descending', () => {
+        const list = [456, 123];
+        const result = util.isSortedLowToHi(list);
+        expect(result).to.equal(false);
+      });
++      it('returns false when list is descending and has duplicate elements', () => {
++        const list = [456, 123, 123];
++        const result = util.isSortedLowToHi(list);
++        expect(result).to.equal(false);
++      });
++      it('returns true when list is only duplicate elements', () => {
++        const list = [123, 123];
++        const result = util.isSortedLowToHi(list);
++        expect(result).to.equal(true);
++      });
+    });
+    context('floats', () => {
+      it('returns true when list is ascending', () => {
+        const list = [123.01, 456.99];
+        const result = util.isSortedLowToHi(list);
+        expect(result).to.equal(true);
+      });
++      it('returns true when list is ascending and has duplicate elements', () => {
++        const list = [15.99, 15.99, 29.99];
++        const result = util.isSortedLowToHi(list);
++        expect(result).to.equal(true);
++      });
+      it('returns false when list is descending', () => {
+        const list = [456.99, 123.01];
+        const result = util.isSortedLowToHi(list);
+        expect(result).to.equal(false);
+      });
++      it('returns false when list is descending and has duplicate elements', () => {
++        const list = [29.99, 15.99, 15.99];
++        const result = util.isSortedLowToHi(list);
++        expect(result).to.equal(false);
++      });
++      it('returns true when list is duplicate elements', () => {
++        const list = [15.99, 15.99];
++        const result = util.isSortedLowToHi(list);
++        expect(result).to.equal(true);
+      });
+      it('returns true when list is ascending: saucedemo results', () => {
+        // Obtained via console.log on the `items` variable (in test/specs/e2e/inventory.e2e.js, Line 43)
+        // Corresponds to the value returned from the "Price (low to high)" test
+        const list = [7.99, 9.99, 15.99, 15.99, 29.99, 49.99];
+        const result = util.isSortedLowToHi(list);
+        expect(result).to.equal(true);
+      });
+    });
+  });
+});
+```
+
+If you run `npm run unit` now... You see a LOT of failures. And every single one is related to duplicate elements.
+
+<Picture
+  src="/src/assets/unit-testing-your-e2e-tests/phase-5-failures.png"
+  alt="an image of a lot of unit test failures"
+/>
+
+The bug has been isolated: Duplicate elements in an array for both functions cause the function to always return `false`, stating that they are unsorted when they actually are.
+
+## Phase 6: The bug fix
+
+For reference, lets take a look at the `lib/util.js` file and see what we can find that may be the issue:
+
+Follow along with the commit for this phase [here.](https://github.com/gendelbendel/saucedemo-wdio/commit/0b6caa88bd1aab03d544b3dc989a041263df7eb9)
+
+Run `git checkout 0b6caa88` and `npm run unit`, followed by `npm run wdio`.
+
+```js title="lib/util.js" showLineNumbers
+/**
+ *
+ * @param {any[]} arr array of values to check
+ * @returns true if array is sorted highest to lowest, false otherwise
+ */
+const isSortedHiToLow = (arr) =>
+  arr.every((val, index, arr) => !index || arr[index - 1] > val);
+
+/**
+ *
+ * @param {any[]} arr array of values to check
+ * @returns true if array is sorted lowest to highest, false otherwise
+ */
+const isSortedLowToHi = (arr) =>
+  arr.every((val, index, arr) => !index || arr[index - 1] < val);
+
+module.exports = {
+  isSortedHiToLow,
+  isSortedLowToHi,
+};
+```
+
+One thing that stands out is that in our comparisons, we are not allowing the `arr[index - 1]{:js}` or `val{:js}` values to be equal to each other; we are always using greater than or less than.
+
+So, lets make a quick change and run our unit tests:
+
+```js title=""
+/**
+ *
+ * @param {any[]} arr array of values to check
+ * @returns true if array is sorted highest to lowest, false otherwise
+ */
+const isSortedHiToLow = (arr) =>
+-  arr.every((val, index, arr) => !index || arr[index - 1] > val);
++  arr.every((val, index, arr) => !index || arr[index - 1] >= val);
+
+/**
+ *
+ * @param {any[]} arr array of values to check
+ * @returns true if array is sorted lowest to highest, false otherwise
+ */
+const isSortedLowToHi = (arr) =>
+-  arr.every((val, index, arr) => !index || arr[index - 1] < val);
++  arr.every((val, index, arr) => !index || arr[index - 1] <= val);
+
+module.exports = {
+  isSortedHiToLow,
+  isSortedLowToHi,
+};
+```
+
+If we run `npm run unit`... All the unit tests pass!
+
+<Picture
+  src="/src/assets/unit-testing-your-e2e-tests/all-unit-pass.png"
+  alt="an image of a lot of happy unit tests"
+/>
+
+Now... Do the e2e tests also pass?
+
+Drumroll please.
+
+`npm run wdio:inventory`
+
+<Picture
+  src="/src/assets/unit-testing-your-e2e-tests/all-e2e-pass.png"
+  alt="an image of a lot of happy e2e tests"
+/>
+
+## The pull request in full
+
+While this article is quite lengthy, the code in question is more terse.
+
+Find the pull request and each individual commit [here](https://github.com/gendelbendel/saucedemo-wdio/pull/1).
+## Where to go from here?
+
+This example may have been a trivial one, but we went from having zero unit test coverage to having 34 unique tests, and we really only covered a few assumptions that we had been making before. There's still a ton of room for more tests that could be written.
+
+For example:
+1. What happens if the array being supplied is of type `boolean{:js}`?
+2. What happens if the array has multiple different types (like a mixture of floats, ints, and strings?)
+3. What happens if the array is empty?
+4. What happens if the array is duplicates, but of different types (like `[1, 1.0, "1", "1.0"]{:js}`)?
+
+We've really only scratched the surface... and these functions are, again, quite trivial. 
+
+## Final notes
+
+As your code grows in complexity, so does your potential for errors. Unit testing your code is one way to help cover for those issues, but is not the only way.
+
+There's a lot of duplication of code in our unit tests, which can be one area where that complexity can come in. The only real things changing is the data going in, and the expectation of results. Similar to how we generate tests within `test/specs/e2e/inventory.e2e.js`, we can also generate unit tests and simplify our code. 
+
+This mindset of testing your tests that are testing your tests can go as deep as you want to go. And perhaps, I'll write another post going into what that world looks like.
+
+Until next time.
