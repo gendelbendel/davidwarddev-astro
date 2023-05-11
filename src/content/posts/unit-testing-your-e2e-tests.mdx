@@ -209,18 +209,22 @@ Source of this `lib/util.js` on our current commit can be found [here](https://g
 /**
  *
  * @param {any[]} arr array of values to check
- * @returns true if array is sorted highest to lowest, false otherwise
+ * @returns true if array is sorted 
+ *    highest to lowest, false otherwise
  */
 const isSortedHiToLow = (arr) =>
-  arr.every((val, index, arr) => !index || arr[index - 1] > val);
+  arr.every((val, index, arr) => 
+    !index || arr[index - 1] > val);
 
 /**
  *
  * @param {any[]} arr array of values to check
- * @returns true if array is sorted lowest to highest, false otherwise
+ * @returns true if array is sorted 
+ *    lowest to highest, false otherwise
  */
 const isSortedLowToHi = (arr) =>
-  arr.every((val, index, arr) => !index || arr[index - 1] < val);
+  arr.every((val, index, arr) => 
+    !index || arr[index - 1] < val);
 
 module.exports = {
   isSortedHiToLow,
@@ -891,18 +895,22 @@ Run `git checkout 0b6caa88` and `npm run unit`, followed by `npm run wdio`.
 /**
  *
  * @param {any[]} arr array of values to check
- * @returns true if array is sorted highest to lowest, false otherwise
+ * @returns true if array is sorted 
+ *    highest to lowest, false otherwise
  */
 const isSortedHiToLow = (arr) =>
-  arr.every((val, index, arr) => !index || arr[index - 1] > val);
+  arr.every((val, index, arr) => 
+    !index || arr[index - 1] > val);
 
 /**
  *
  * @param {any[]} arr array of values to check
- * @returns true if array is sorted lowest to highest, false otherwise
+ * @returns true if array is sorted 
+ *    lowest to highest, false otherwise
  */
 const isSortedLowToHi = (arr) =>
-  arr.every((val, index, arr) => !index || arr[index - 1] < val);
+  arr.every((val, index, arr) => 
+    !index || arr[index - 1] < val);
 
 module.exports = {
   isSortedHiToLow,
@@ -918,20 +926,24 @@ So, lets make a quick change and run our unit tests:
 /**
  *
  * @param {any[]} arr array of values to check
- * @returns true if array is sorted highest to lowest, false otherwise
+ * @returns true if array is sorted 
+ *    highest to lowest, false otherwise
  */
 const isSortedHiToLow = (arr) =>
--  arr.every((val, index, arr) => !index || arr[index - 1] > val);
-+  arr.every((val, index, arr) => !index || arr[index - 1] >= val);
+  arr.every((val, index, arr) => 
+-    !index || arr[index - 1] > val);
++    !index || arr[index - 1] >= val);
 
 /**
  *
  * @param {any[]} arr array of values to check
- * @returns true if array is sorted lowest to highest, false otherwise
+ * @returns true if array is sorted 
+ *    lowest to highest, false otherwise
  */
 const isSortedLowToHi = (arr) =>
--  arr.every((val, index, arr) => !index || arr[index - 1] < val);
-+  arr.every((val, index, arr) => !index || arr[index - 1] <= val);
+  arr.every((val, index, arr) => 
+-    !index || arr[index - 1] < val);
++    !index || arr[index - 1] <= val);
 
 module.exports = {
   isSortedHiToLow,
