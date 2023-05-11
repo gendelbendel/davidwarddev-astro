@@ -267,8 +267,6 @@ code > .deleted::before {
   border-left-color: #d01212;
   border-left-width: 3px;
   border-left-style: solid;
-  counter-increment: line;
-  content: "-";
 }
 
 code > .inserted {
