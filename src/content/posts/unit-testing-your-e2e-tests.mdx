@@ -22,20 +22,20 @@ import { Picture } from "astro-imagetools/components";
 
 You've heard that phrase before. "Treat your test code like production code". Maybe once, maybe twice, maybe countless times.
 
-Everyone says it's a good idea. Some people even describe what it means!
+Everyone says it's a good idea. Few describe what it means and even fewer describe how to do it.
 
 For fun, let's hear what ChatGPT has to say about the topic:
 
 > "Treating test code like production code means applying the same level of care and attention to detail when writing and maintaining tests as you would for production code. This helps ensure that your tests are reliable, maintainable, and provide accurate feedback about the quality of your application."
 
-Ultimately, treating test code like production code is about _recognizing the importance of testing in the software development process, including the testing process itself_. By investing in high quality tests, you can improve the overall quality of your application, increase your confidence in its behavior, and ensure a better user experience for your customers.
+Ultimately, treating test code like production code is about acknowledging the crucial role that testing plays within the software development process, by evaluating it in the same way that you would evaluate the application itself. By investing in high quality tests, you can improve the overall quality of your application, increase your confidence in its behavior, and ensure a better user experience for your customers.
 
 Let's briefly go over what some criteria of "reliable, maintainable" tests might look like:
 
 - Stored in version control
 - Run in a CI/CD pipeline
 - Reusable code
-- Pass in CI reliably
+- Results are able to be diagnosed within CI trivially
 - Are themselves covered by unit tests
 
 ## "Wait... repeat that last one?"
@@ -68,9 +68,19 @@ That's because for every heading under the ["The Benefits of testing your tests"
 
 It all applies to us testers, as well.
 
+## Where to unit test your tests
+
+As a baseline, you'll want to unit test code where you've added complexity or logic that might affect test results.
+
+For example:
+
+- Data transformation: If you're creating data to insert into the application, either from your own set of rules and/or based on input you've received from the application itself, ensuring that your data gets transformed properly is important.
+- API wrappers: Are you hitting an API to gather data to be used by your tests? Make sure, for example, your API authentication logic is covered with tests to ensure your tests don't fail because you attempted to login incorrectly.
+- Other utility functions: Date manipulation, math calculations (cart logic, coupon codes, etc), string formatting, logic comparisons, and more all belong to a category of code that benefit highly from unit test coverage.
+
 ## "I'm still not sold"
 
-Allow me to introduce you to some fun then: An example project and a hypothetical situation, that we're going to play out together for the rest of the article.
+Allow me to introduce you to some fun, then: an example project and a hypothetical situation we're going to play out together throughout the rest of the article. A tutorial if you will.
 
 ## The project
 
@@ -145,21 +155,21 @@ describe("Inventory", () => {
 });
 ```
 
-### Explaination of the e2e spec
+### Explanation of the e2e spec
 
 If we dig into this code, this is the behavior pathing of the code that we see:
 
-1. We enter `beforeEach` and open up the login page, then login as an authorized user.
-2. We generate a list of tests we want to create:
+1. We enter `beforeEach` and open up the login page, fill out the credentials, and login as an authorized user.
+2. We generate a list of similar tests we want to run. To do this we have:
 
-   1. A value for `sortBy`, which is equal to `"Name (A to Z)"`, which corresponds to both the name of the test and to determine how to sort the products on the page. We can see that here:
+   1. A value for `sortBy`, which is set to the corresponding sort option in the application. For example `"Name (A to Z)"`, which corresponds to both the name of the test and how to sort the products on the page. We can see that here:
 
       <Picture
         src="/src/assets/unit-testing-your-e2e-tests/name-a-z.png"
         alt="saucedemo sorting select list"
       />
 
-   2. A `predicate`, which is a function we have created to make a decision as to whether the values we received from the website are correct or not, which we set to a `util.isSortedLowToHi{:js}` function
+   2. A `predicate`, which is a function we create to make a decision as to whether the values we received from the website are correct or not, which we set to a `util.isSortedLowToHi{:js}` function
    3. An `items` property, which is how we retrieve the items to make a comparison for.
    4. Repeat for each item in the array, with their corresponding values.
 
@@ -171,9 +181,9 @@ If we dig into this code, this is the behavior pathing of the code that we see:
 
 The key point here is that we have some custom logic to determine whether the data we have matches some criteria, which is in a `lib/util.js` file we have created. Remember this for later.
 
-Let's look at a manual exploration of the product under test, to see if we can see with our own eyes what behavior is being exhibited, to see if our tests have found a bug, or if our tests are bugged themselves.
+Let's look at the product under test, to see if we can see with our own eyes what behavior is being exhibited, to see if our tests have found a bug, or if our tests are bugged themselves.
 
-### Manual exploration
+### Exploration
 
 If you browse to https://saucedemo.com, login with `standard_user` and `secret_sauce` as the username and password combo, you're greeted with the product inventory screen.
 
@@ -201,7 +211,7 @@ So we should start by looking at _what it is that is determining whether our tes
 
 So, we investigate.
 
-### Explaination of `lib/util.js`
+### Explanation of `lib/util.js`
 
 Source of this `lib/util.js` on our current commit can be found [here](https://github.com/gendelbendel/saucedemo-wdio/blob/a0874e213b39a7fae5aa26e32813c6573e17cdc4/lib/util.js).
 
@@ -209,22 +219,20 @@ Source of this `lib/util.js` on our current commit can be found [here](https://g
 /**
  *
  * @param {any[]} arr array of values to check
- * @returns true if array is sorted 
+ * @returns true if array is sorted
  *    highest to lowest, false otherwise
  */
 const isSortedHiToLow = (arr) =>
-  arr.every((val, index, arr) => 
-    !index || arr[index - 1] > val);
+  arr.every((val, index, arr) => !index || arr[index - 1] > val);
 
 /**
  *
  * @param {any[]} arr array of values to check
- * @returns true if array is sorted 
+ * @returns true if array is sorted
  *    lowest to highest, false otherwise
  */
 const isSortedLowToHi = (arr) =>
-  arr.every((val, index, arr) => 
-    !index || arr[index - 1] < val);
+  arr.every((val, index, arr) => !index || arr[index - 1] < val);
 
 module.exports = {
   isSortedHiToLow,
@@ -261,7 +269,7 @@ Now we just want to see what it looks like to have unit tests and run them again
 
 [Here's](https://github.com/gendelbendel/saucedemo-wdio/commit/39edcca65939413b6a22ef13ca51d4fe72f41f65) the full commit for that.
 
-Feel free to `git checkout 39edcca` and then run `npm run unit`.
+Feel free to `git checkout 39edcca` and then `npm run unit`.
 
 ```js title="test/specs/unit/util.unit.js"
 const util = require('../../../lib/util');
@@ -371,7 +379,7 @@ In the console output, we get the following arrays (with added comments):
 [7.99, 9.99, 15.99, 15.99, 29.99, 49.99]
 ```
 
-So with that data in hand, let's add a couple more tests!
+So with this data in hand, let's add a couple more tests!
 
 ### 3. Adding tests
 
@@ -396,9 +404,9 @@ describe('util.js', () => {
     });
 +    it('returns true when list is descending: ' +
 +        'saucedemo results', () => {
-+      // Obtained via console.log on the `items` variable 
++      // Obtained via console.log on the `items` variable
 +      // (in test/specs/e2e/inventory.e2e.js, Line 43)
-+      // Corresponds to the value returned from the 
++      // Corresponds to the value returned from the
 +      //"Price (high to low)" test
 +      const list = [49.99, 29.99, 15.99, 15.99, 9.99, 7.99];
 +      const result = util.isSortedHiToLow(list);
@@ -418,9 +426,9 @@ describe('util.js', () => {
     });
 +    it('returns true when list is ascending: ' +
 +        'saucedemo results', () => {
-+      // Obtained via console.log on the `items` variable 
++      // Obtained via console.log on the `items` variable
 +      // (in test/specs/e2e/inventory.e2e.js, Line 43)
-+      // Corresponds to the value returned from the 
++      // Corresponds to the value returned from the
 +      // "Price (low to high)" test
 +      const list = [7.99, 9.99, 15.99, 15.99, 29.99, 49.99];
 +      const result = util.isSortedLowToHi(list);
@@ -430,7 +438,7 @@ describe('util.js', () => {
 });
 ```
 
-Now if we run `npm run unit{:bash}`... Aha! We have observed failing results. We now have data that we know for sure is causing a problem.
+Now if we `npm run unit{:bash}`... Aha! We have observed failing results. We now have data that we know for sure is causing a problem.
 
 And if we inspect these arrays, we observe that they are in fact in the correct order, which proves that there is something incorrect with our sorting function. If you've been following along closely so far, and you take a close look at `lib/util.js`, you might already know how to fix it, but let us continue.
 
@@ -438,7 +446,7 @@ And if we inspect these arrays, we observe that they are in fact in the correct 
 
 Follow along with the commit for this phase [here.](https://github.com/gendelbendel/saucedemo-wdio/commit/bea32a04d1a21485775c9910283a00977b960122)
 
-So in our current tests, we are making a few assumptions as to what is acceptable data and what is not. So lets try to think about what assumptions we are making, so we can begin testing against them.
+In our current tests, we are making a few assumptions as to what is acceptable data and what is not. Let's try to think about what assumptions we are making, so we can begin testing against them.
 
 A non-comprehensive list of assumptions:
 
@@ -451,7 +459,7 @@ A non-comprehensive list of assumptions:
 4. We were only testing against arrays with unique elements. Once we introduced arrays with duplicate elements, issues appeared.
    - Idea: Is the issue related to array uniqueness?
 
-So, lets begin testing against some of these assumptions, and look for failures.
+Let's begin testing against some of these assumptions, and look for failures.
 
 ### Begin clearing up assumptions
 
@@ -478,9 +486,9 @@ describe('util.js', () => {
 +      it('returns true when list is ' +
 +          'alphabetical descending: ' +
 +          'saucedemo results', () => {
-+        // Obtained via console.log on the `items` variable 
++        // Obtained via console.log on the `items` variable
 +        // (in test/specs/e2e/inventory.e2e.js, Line 43)
-+        // Corresponds to the value returned from the 
++        // Corresponds to the value returned from the
 +        // "Name (Z to A)" test
 +        const list = [
 +          'Test.allTheThings() T-Shirt (Red)',
@@ -519,9 +527,9 @@ describe('util.js', () => {
 +      });
       it('returns true when list is descending: ' +
           'saucedemo results', () => {
-        // Obtained via console.log on the `items` variable 
+        // Obtained via console.log on the `items` variable
         // (in test/specs/e2e/inventory.e2e.js, Line 43)
-        // Corresponds to the value returned from the 
+        // Corresponds to the value returned from the
         // "Price (high to low)" test
         const list = [49.99, 29.99, 15.99, 15.99, 9.99, 7.99];
         const result = util.isSortedHiToLow(list);
@@ -546,9 +554,9 @@ describe('util.js', () => {
 +      it('returns true when list is ' +
 +          'alphabetical ascending: ' +
 +          'saucedemo results', () => {
-+        // Obtained via console.log on the `items` variable 
++        // Obtained via console.log on the `items` variable
 +        // (in test/specs/e2e/inventory.e2e.js, Line 43)
-+        // Corresponds to the value returned from the 
++        // Corresponds to the value returned from the
 +        //"Name (A to Z)" test
 +        const list = [
 +          'Sauce Labs Backpack',
@@ -587,9 +595,9 @@ describe('util.js', () => {
 +      });
       it('returns true when list is ascending: ' +
           'saucedemo results', () => {
-        // Obtained via console.log on the `items` variable 
+        // Obtained via console.log on the `items` variable
         // (in test/specs/e2e/inventory.e2e.js, Line 43)
-        // Corresponds to the value returned from the 
+        // Corresponds to the value returned from the
         // "Price (low to high)" test
         const list = [7.99, 9.99, 15.99, 15.99, 29.99, 49.99];
         const result = util.isSortedLowToHi(list);
@@ -604,7 +612,7 @@ You'll now see we have multiple branching `contexts` organizing our code, based 
 
 For each data type we think we should test against, we added a layer of tests for them, which includes some dummy data as well as the data we know we are receiving.
 
-Now if we run `npm run unit`... We get no additional new failures.
+Now if we `npm run unit`... We get no additional new failures.
 
 Which assumptions did we clear up? Which ones have we still not tackled?
 
@@ -661,9 +669,9 @@ describe('util.js', () => {
       it('returns true when list is ' +
           'alphabetical descending: ' +
           'saucedemo results', () => {
-        // Obtained via console.log on the `items` variable 
+        // Obtained via console.log on the `items` variable
         // (in test/specs/e2e/inventory.e2e.js, Line 43)
-        // Corresponds to the value returned from the 
+        // Corresponds to the value returned from the
         // "Name (Z to A)" test
         const list = [
           'Test.allTheThings() T-Shirt (Red)',
@@ -738,9 +746,9 @@ describe('util.js', () => {
 +      });
       it('returns true when list is descending: ' +
           'saucedemo results', () => {
-        // Obtained via console.log on the `items` variable 
+        // Obtained via console.log on the `items` variable
         // (in test/specs/e2e/inventory.e2e.js, Line 43)
-        // Corresponds to the value returned from the 
+        // Corresponds to the value returned from the
         // "Price (high to low)" test
         const list = [49.99, 29.99, 15.99, 15.99, 9.99, 7.99];
         const result = util.isSortedHiToLow(list);
@@ -757,7 +765,7 @@ describe('util.js', () => {
         expect(result).to.equal(true);
       });
 +      it('returns true when list is ' +
-+           'alphabetical ascending' + 
++           'alphabetical ascending' +
 +           'and has duplicate elements', () => {
 +        const list = ['abc', 'abc', 'xyz'];
 +        const result = util.isSortedLowToHi(list);
@@ -782,11 +790,11 @@ describe('util.js', () => {
 +        expect(result).to.equal(true);
 +      });
       it('returns true when list is ' +
-          'alphabetical ascending: ' + 
+          'alphabetical ascending: ' +
           'saucedemo results', () => {
-        // Obtained via console.log on the `items` variable 
+        // Obtained via console.log on the `items` variable
         // (in test/specs/e2e/inventory.e2e.js, Line 43)
-        // Corresponds to the value returned from the 
+        // Corresponds to the value returned from the
         // "Name (A to Z)" test
         const list = [
           'Sauce Labs Backpack',
@@ -806,7 +814,7 @@ describe('util.js', () => {
         const result = util.isSortedLowToHi(list);
         expect(result).to.equal(true);
       });
-+      it('returns true when list is ascending ' + 
++      it('returns true when list is ascending ' +
 +          'and has duplicate elements', () => {
 +        const list = [123, 123, 456];
 +        const result = util.isSortedLowToHi(list);
@@ -836,7 +844,7 @@ describe('util.js', () => {
         const result = util.isSortedLowToHi(list);
         expect(result).to.equal(true);
       });
-+      it('returns true when list is ascending ' + 
++      it('returns true when list is ascending ' +
 +          'and has duplicate elements', () => {
 +        const list = [15.99, 15.99, 29.99];
 +        const result = util.isSortedLowToHi(list);
@@ -861,9 +869,9 @@ describe('util.js', () => {
       });
       it('returns true when list is ascending: ' +
         'saucedemo results', () => {
-        // Obtained via console.log on the `items` variable 
+        // Obtained via console.log on the `items` variable
         // (in test/specs/e2e/inventory.e2e.js, Line 43)
-        // Corresponds to the value returned from the 
+        // Corresponds to the value returned from the
         // "Price (low to high)" test
         const list = [7.99, 9.99, 15.99, 15.99, 29.99, 49.99];
         const result = util.isSortedLowToHi(list);
@@ -874,7 +882,7 @@ describe('util.js', () => {
 });
 ```
 
-If you run `npm run unit` now... You see a LOT of failures. And every single one is related to duplicate elements.
+If you `npm run unit` now... You see a LOT of failures. And every single one is related to duplicate elements.
 
 <Picture
   src="/src/assets/unit-testing-your-e2e-tests/phase-5-failures.png"
@@ -885,7 +893,7 @@ The bug has been isolated: Duplicate elements in an array for both functions cau
 
 ## Phase 6: The bug fix
 
-For reference, lets take a look at the `lib/util.js` file and see what we can find that may be the issue:
+For reference, we will take a look at the `lib/util.js` file again and see if we can find what may be the issue:
 
 Follow along with the commit for this phase [here.](https://github.com/gendelbendel/saucedemo-wdio/commit/0b6caa88bd1aab03d544b3dc989a041263df7eb9)
 
@@ -895,22 +903,20 @@ Run `git checkout 0b6caa88` and `npm run unit`, followed by `npm run wdio`.
 /**
  *
  * @param {any[]} arr array of values to check
- * @returns true if array is sorted 
+ * @returns true if array is sorted
  *    highest to lowest, false otherwise
  */
 const isSortedHiToLow = (arr) =>
-  arr.every((val, index, arr) => 
-    !index || arr[index - 1] > val);
+  arr.every((val, index, arr) => !index || arr[index - 1] > val);
 
 /**
  *
  * @param {any[]} arr array of values to check
- * @returns true if array is sorted 
+ * @returns true if array is sorted
  *    lowest to highest, false otherwise
  */
 const isSortedLowToHi = (arr) =>
-  arr.every((val, index, arr) => 
-    !index || arr[index - 1] < val);
+  arr.every((val, index, arr) => !index || arr[index - 1] < val);
 
 module.exports = {
   isSortedHiToLow,
@@ -926,22 +932,22 @@ So, lets make a quick change and run our unit tests:
 /**
  *
  * @param {any[]} arr array of values to check
- * @returns true if array is sorted 
+ * @returns true if array is sorted
  *    highest to lowest, false otherwise
  */
 const isSortedHiToLow = (arr) =>
-  arr.every((val, index, arr) => 
+  arr.every((val, index, arr) =>
 -    !index || arr[index - 1] > val);
 +    !index || arr[index - 1] >= val);
 
 /**
  *
  * @param {any[]} arr array of values to check
- * @returns true if array is sorted 
+ * @returns true if array is sorted
  *    lowest to highest, false otherwise
  */
 const isSortedLowToHi = (arr) =>
-  arr.every((val, index, arr) => 
+  arr.every((val, index, arr) =>
 -    !index || arr[index - 1] < val);
 +    !index || arr[index - 1] <= val);
 
@@ -988,12 +994,10 @@ For example:
 
 We've really only scratched the surface... and these functions are, again, quite trivial.
 
+Additionally, there's a lot of duplication of code in our unit tests, which can be one area where that complexity can come in. The only real things changing is the data going in, and the expectation of results. Similar to how we generate tests within `test/specs/e2e/inventory.e2e.js`, we can also generate unit tests and simplify our code.
+
 ## Final notes
 
-As your code grows in complexity, so does your potential for errors. Unit testing your code is one way to help cover for those issues, but is not the only way.
+Here we've described how unit testing your code is one way to treat test code like production code.
 
-There's a lot of duplication of code in our unit tests, which can be one area where that complexity can come in. The only real things changing is the data going in, and the expectation of results. Similar to how we generate tests within `test/specs/e2e/inventory.e2e.js`, we can also generate unit tests and simplify our code.
-
-This mindset of testing your tests that are testing your tests can go as deep as you want to go. And perhaps, I'll write another post going into what that world looks like.
-
-Until next time.
+As your custom test code grows in complexity, so does the potential for errors. Unit testing is a good way to quickly understand if that's true.
