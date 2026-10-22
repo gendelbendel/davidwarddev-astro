@@ -21,9 +21,13 @@
     "date-fns": "^2.29.3",
     "patch-package": "^7.0.0",
     "preact": "^10.13.2",
-    "rehype-pretty-code": "^0.9.5"
+    "rehype-pretty-code": "^0.9.5",
+    "sharp": "^0.32.6"
   },
   "devDependencies": {
     "simple-icons": "^8.10.0"
+  },
+  "engines": {
+    "node": "24.x"
   }
 }
