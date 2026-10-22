@@ -47,7 +47,7 @@ export default defineConfig({
     }),
     astroImageTools,
     compress({
-      img: false,
+      Image: false,
     }),
   ],
   markdown: {

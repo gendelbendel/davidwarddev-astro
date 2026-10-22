@@ -16,7 +16,7 @@
     "@astrojs/rss": "^2.3.2",
     "@astrojs/vercel": "^3.3.0",
     "astro": "^2.4.2",
-    "astro-compress": "^1.1.36",
+    "astro-compress": "~2.0.15",
     "astro-imagetools": "^0.8.1",
     "date-fns": "^2.29.3",
     "patch-package": "^7.0.0",
